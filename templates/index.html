@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FaceMatch - Deteksi Kemiripan Wajah</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <style>
+        :root {
+            --fm-pink: #ec4f7f;
+            --fm-pink-light: #fde7ee;
+            --fm-bg: #f7f7fa;
+            --fm-dark: #2b2d3a;
+            --fm-muted: #8c8fa3;
+            --fm-border: #ececf3;
+            --fm-green: #2bb673;
+            --fm-green-bg: #e8f8f0;
+            --fm-amber: #e0a13a;
+            --fm-amber-bg: #fdf2e2;
+        }
+
+        body {
+            background-color: var(--fm-bg);
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            color: var(--fm-dark);
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        .display-font {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* ---------- HEADER ---------- */
+        .header-section {
+            text-align: center;
+            margin-bottom: 2.75rem;
+        }
+
+        .header-logo {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.85rem;
+        }
+
+        .header-icon-badge {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--fm-pink) 0%, #f47b9d 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.6rem;
+            box-shadow: 0 8px 20px rgba(236, 79, 127, 0.25);
+        }
+
+        .header-section h1 {
+            font-weight: 800;
+            font-size: 2.5rem;
+            letter-spacing: -0.02em;
+            margin-bottom: 0;
+            color: var(--fm-dark);
+        }
+
+        .header-section p {
+            color: var(--fm-muted);
+            font-size: 1rem;
+            margin-top: 0.35rem;
+        }
+
+        .header-divider {
+            width: 90px;
+            height: 3px;
+            border-radius: 3px;
+            background: linear-gradient(90deg, transparent, var(--fm-pink), transparent);
+            margin: 1.25rem auto 0;
+        }
+
+        /* ---------- CARDS ---------- */
+        .main-card {
+            border: 1px solid var(--fm-border);
+            border-radius: 18px;
+            background: #ffffff;
+        }
+
+        .card-title-row {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-weight: 700;
+            color: var(--fm-dark);
+            font-size: 1.05rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title-row i {
+            color: var(--fm-pink);
+        }
+
+        /* ---------- UPLOAD ---------- */
+        .upload-zone {
+            border: 1.5px dashed #dcdee8;
+            border-radius: 14px;
+            padding: 1.4rem;
+            text-align: center;
+            background-color: #fcfcfd;
+            transition: all 0.25s ease;
+        }
+
+        .upload-zone:hover {
+            border-color: var(--fm-pink);
+            background-color: var(--fm-pink-light);
+        }
+
+        .upload-zone i {
+            font-size: 1.6rem;
+            color: var(--fm-pink);
+            margin-bottom: 0.4rem;
+            display: block;
+        }
+
+        .form-label.fw-semibold {
+            font-size: 0.92rem;
+            color: var(--fm-dark);
+        }
+
+        .btn-fm-primary {
+            background: linear-gradient(135deg, var(--fm-pink) 0%, #f47b9d 100%);
+            border: none;
+            color: #fff;
+            font-weight: 700;
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            box-shadow: 0 6px 16px rgba(236, 79, 127, 0.28);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .btn-fm-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(236, 79, 127, 0.35);
+            color: #fff;
+        }
+
+        /* ---------- RESULT PANEL ---------- */
+        .preview-img {
+            max-height: 200px;
+            width: 100%;
+            object-fit: cover;
+            border-radius: 14px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+            border: 1px solid var(--fm-border);
+        }
+
+        .preview-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--fm-muted);
+            margin-top: 0.5rem;
+        }
+
+        /* Donut similarity gauge */
+        .gauge-wrap {
+            position: relative;
+            width: 170px;
+            height: 170px;
+            margin: 0 auto;
+        }
+
+        .gauge-wrap svg {
+            transform: rotate(-90deg);
+        }
+
+        .gauge-bg {
+            fill: none;
+            stroke: var(--fm-border);
+            stroke-width: 14;
+        }
+
+        .gauge-fg {
+            fill: none;
+            stroke: var(--fm-pink);
+            stroke-width: 14;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.8s ease;
+        }
+
+        .gauge-center {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gauge-center .pct {
+            font-size: 1.35rem;
+            font-weight: 800;
+            font-family: 'Poppins', sans-serif;
+            color: var(--fm-dark);
+        }
+
+        .gauge-center .pct-label {
+            font-size: 0.78rem;
+            color: var(--fm-muted);
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .result-badge {
+            font-size: 0.95rem;
+            font-weight: 700;
+            padding: 0.7rem 1.25rem;
+            border-radius: 30px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .result-badge.match {
+            background: var(--fm-green-bg);
+            color: var(--fm-green);
+            border: 1px solid #c7ecdb;
+        }
+
+        .result-badge.nomatch {
+            background: var(--fm-pink-light);
+            color: var(--fm-pink);
+            border: 1px solid #fbd2e0;
+        }
+
+        /* Vector math box */
+        .vector-box {
+            border-radius: 14px;
+            padding: 1.1rem 1.25rem;
+            background: var(--fm-pink-light);
+            border: 1px solid #fbd2e0;
+        }
+
+        .vector-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            font-size: 0.92rem;
+        }
+
+        .vector-row:last-child {
+            border-bottom: none;
+        }
+
+        .vector-row .label {
+            color: var(--fm-muted);
+            font-weight: 500;
+        }
+
+        .vector-row .value {
+            font-weight: 700;
+            color: var(--fm-dark);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .vector-row.highlight .label,
+        .vector-row.highlight .value {
+            color: var(--fm-pink);
+            font-size: 1.05rem;
+        }
+
+        /* Meta info (waktu proses & dimensi vektor) */
+        .meta-info-row {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .meta-info-pill {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: var(--fm-bg);
+            border: 1px solid var(--fm-border);
+            border-radius: 12px;
+            padding: 0.6rem 0.9rem;
+            font-size: 0.85rem;
+            flex: 1;
+            min-width: 160px;
+        }
+
+        .meta-info-pill .icon-circle-sm {
+            width: 32px;
+            height: 32px;
+            border-radius: 9px;
+            background: var(--fm-pink-light);
+            color: var(--fm-pink);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .meta-info-pill .meta-value {
+            font-weight: 700;
+            font-family: 'Poppins', sans-serif;
+            color: var(--fm-dark);
+            font-size: 0.95rem;
+            line-height: 1.1;
+        }
+
+        .meta-info-pill .meta-label {
+            color: var(--fm-muted);
+            font-size: 0.75rem;
+        }
+
+        /* Trend chart */
+        .chart-wrap {
+            position: relative;
+            height: 240px;
+        }
+
+        .chart-stats {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .chart-stat {
+            flex: 1;
+            min-width: 130px;
+            background: var(--fm-bg);
+            border: 1px solid var(--fm-border);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            text-align: center;
+        }
+
+        .chart-stat .stat-value {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 1.3rem;
+            color: var(--fm-pink);
+        }
+
+        .chart-stat .stat-label {
+            color: var(--fm-muted);
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        /* Empty state */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3.5rem 1rem;
+            color: var(--fm-muted);
+            text-align: center;
+        }
+
+        .empty-state i {
+            font-size: 2.6rem;
+            margin-bottom: 1rem;
+            color: #d8dae6;
+        }
+
+        /* ---------- HISTORY TABLE ---------- */
+        .history-badge-count {
+            background: var(--fm-pink-light);
+            color: var(--fm-pink);
+            font-weight: 700;
+            border-radius: 30px;
+            padding: 0.35rem 1rem;
+            font-size: 0.85rem;
+        }
+
+        .table thead th {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--fm-muted);
+            font-weight: 700;
+            border-bottom: 1px solid var(--fm-border);
+            background: transparent;
+        }
+
+        .table tbody td {
+            font-size: 0.9rem;
+            vertical-align: middle;
+            border-bottom: 1px solid var(--fm-border);
+        }
+
+        .badge-status {
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 0.35rem 0.75rem;
+            border-radius: 8px;
+        }
+
+        .badge-status.same {
+            background: var(--fm-green-bg);
+            color: var(--fm-green);
+        }
+
+        .badge-status.diff {
+            background: var(--fm-pink-light);
+            color: var(--fm-pink);
+        }
+
+        .thumb-history {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 1px solid var(--fm-border);
+        }
+
+        .btn-clear {
+            background: #fff;
+            border: 1px solid var(--fm-border);
+            color: var(--fm-muted);
+            font-weight: 600;
+            font-size: 0.85rem;
+            border-radius: 10px;
+            padding: 0.45rem 1rem;
+            cursor: pointer;
+        }
+
+        .btn-clear:hover {
+            border-color: var(--fm-pink);
+            color: var(--fm-pink);
+        }
+
+        /* ---------- BOTTOM INFO STRIP ---------- */
+        .info-strip {
+            border-radius: 16px;
+            border: 1px solid var(--fm-border);
+            background: #ffffff;
+            padding: 1.4rem 1.6rem;
+        }
+
+        .info-strip h6 {
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.9rem;
+            color: var(--fm-dark);
+        }
+
+        .info-strip .icon-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--fm-pink-light);
+            color: var(--fm-pink);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+        }
+
+        .concept-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            font-size: 0.85rem;
+            color: var(--fm-dark);
+            font-weight: 500;
+            background: var(--fm-bg);
+            border: 1px solid var(--fm-border);
+            border-radius: 30px;
+            padding: 0.4rem 0.9rem;
+            margin: 0.2rem;
+        }
+
+        .concept-pill i {
+            color: var(--fm-green);
+        }
+
+        /* Pilihan Metode */
+        .method-selector {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .method-option {
+            flex: 1;
+            position: relative;
+        }
+
+        .method-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+        }
+
+        .method-option label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.75rem 0.5rem;
+            border: 2px solid var(--fm-border);
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.88rem;
+            color: var(--fm-muted);
+            background: #fcfcfd;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .method-option label i {
+            font-size: 1.3rem;
+            color: var(--fm-muted);
+        }
+
+        .method-option input[type="radio"]:checked+label {
+            border-color: var(--fm-pink);
+            background: var(--fm-pink-light);
+            color: var(--fm-pink);
+        }
+
+        .method-option input[type="radio"]:checked+label i {
+            color: var(--fm-pink);
+        }
+
+        .method-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .method-badge.arcface {
+            background: #e8eeff;
+            color: #4a6cf7;
+        }
+
+        .method-badge.pca {
+            background: #e8f8f0;
+            color: var(--fm-green);
+        }
+
+        .header-section h1 {
+            font-size: 1.9rem;
+        }
+
+        .gauge-wrap {
+            width: 140px;
+            height: 140px;
+        }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container py-5">
+
+        <div class="header-section">
+            <div class="header-logo">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo FaceMatch"
+                    style="width:56px;height:56px;border-radius:18px;object-fit:cover;box-shadow:0 8px 20px rgba(236,79,127,0.25);border:2.5px solid var(--fm-pink);"
+                    onerror="this.style.display='none';document.getElementById('fallback-icon').style.display='flex';">
+                <div id="fallback-icon" class="header-icon-badge" style="display:none;"><i
+                        class="fa-solid fa-face-viewfinder"></i></div>
+                <h1>FaceMatch</h1>
+            </div>
+            <p>Deteksi Kemiripan Wajah Masa Kecil dan Dewasa Berdasarkan Prinsip Aljabar Linear</p>
+            <div class="header-divider"></div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-5">
+                <div class="card main-card shadow-sm p-4 h-100">
+                    <div class="card-title-row"><i class="fa-solid fa-cloud-arrow-up"></i>Upload Foto</div>
+
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Foto Masa Kecil</label>
+                            <div class="upload-zone">
+                                <i class="fa-solid fa-baby"></i>
+                                <input type="file" name="foto_kecil" class="form-control" accept="image/*" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Foto Masa Dewasa</label>
+                            <div class="upload-zone">
+                                <i class="fa-solid fa-user"></i>
+                                <input type="file" name="foto_dewasa" class="form-control" accept="image/*" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Pilih Metode Analisis</label>
+                            <div class="method-selector">
+                                <div class="method-option">
+                                    <input type="radio" name="metode" id="metode_pca" value="pca">
+                                    <label for="metode_pca">
+                                        <i class="fa-solid fa-layer-group"></i>
+                                        PCA / Eigenfaces
+                                        <small style="font-weight:400;color:inherit;font-size:0.75rem;">Aljabar
+                                            Linear</small>
+                                    </label>
+                                </div>
+                                <div class="method-option">
+                                    <input type="radio" name="metode" id="metode_arcface" value="arcface" checked>
+                                    <label for="metode_arcface">
+                                        <i class="fa-solid fa-robot"></i>
+                                        ArcFace
+                                        <small style="font-weight:400;color:inherit;font-size:0.75rem;">Deep
+                                            Learning</small>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Threshold opsional — hanya muncul saat PCA dipilih -->
+                        <div id="threshold-box" style="display:none; margin-bottom:1rem;">
+                            <div
+                                style="background:#f7f7fa; border:1px solid var(--fm-border); border-radius:12px; padding:0.85rem 1rem;">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label class="form-label fw-semibold mb-0" style="font-size:0.88rem;">
+                                        <i class="fa-solid fa-sliders me-1" style="color:var(--fm-pink);"></i>
+                                        Threshold PCA
+                                        <span
+                                            style="font-weight:400; color:var(--fm-muted); font-size:0.78rem;">(opsional)</span>
+                                    </label>
+                                    <span id="threshold-val"
+                                        style="font-weight:700; color:var(--fm-pink); font-size:0.9rem;">0.60</span>
+                                </div>
+                                <input type="range" name="threshold_pca" id="threshold-slider" min="0.30" max="0.90"
+                                    step="0.05" value="0.60" style="width:100%; accent-color:var(--fm-pink);"
+                                    oninput="document.getElementById('threshold-val').textContent = parseFloat(this.value).toFixed(2)">
+                                <div style="font-size:0.75rem; color:var(--fm-muted); margin-top:0.4rem;">
+                                    <i class="fa-solid fa-circle-info me-1"></i>
+                                    Nilai default <strong>0.60</strong>. Naikkan jika ingin lebih ketat, turunkan jika
+                                    ingin lebih longgar. Kosongkan slider untuk pakai nilai otomatis.
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-fm-primary w-100" type="submit">
+                            <i class="fa-solid fa-calculator me-2"></i>Analisis Kemiripan
+                        </button>
+                    </form>
+
+                    {% if hasil and hasil.status == "error" %}
+                    <div class="alert alert-danger mt-4 rounded-3 d-flex align-items-center" role="alert">
+                        <i class="fa-solid fa-circle-exclamation me-2 fs-5"></i>
+                        <div>{{ hasil.pesan }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                <div class="card main-card shadow-sm p-4 h-100 bg-white">
+                    <div class="card-title-row"><i class="fa-solid fa-square-poll-horizontal"></i>Hasil Analisis</div>
+
+                    {% if hasil and hasil.status == "ok" %}
+                    <!-- Badge metode yang digunakan -->
+                    <div class="mb-3">
+                        {% if hasil.metode == "pca" %}
+                        <span class="method-badge pca"><i class="fa-solid fa-layer-group me-1"></i>Metode: PCA /
+                            Eigenfaces</span>
+                        {% else %}
+                        <span class="method-badge arcface"><i class="fa-solid fa-robot me-1"></i>Metode: ArcFace (Deep
+                            Learning)</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="row g-3 align-items-center mb-4">
+                        <div class="col-4 text-center">
+                            <img src="{{ url_for('uploaded_file', filename=foto_kecil) }}" class="preview-img"
+                                alt="Kecil">
+                            <div class="preview-label">Foto Masa Kecil</div>
+                        </div>
+
+                        <div class="col-4 text-center">
+                            <div class="gauge-wrap">
+                                <svg viewBox="0 0 160 160">
+                                    <circle class="gauge-bg" cx="80" cy="80" r="68"></circle>
+                                    <circle id="gaugeFg" class="gauge-fg" cx="80" cy="80" r="68"
+                                        stroke-dasharray="427.26" stroke-dashoffset="427.26"
+                                        data-target="{{ hasil.data.persentase }}">
+                                    </circle>
+                                </svg>
+                                <div class="gauge-center">
+                                    <div class="pct" id="pctCounter" data-target="{{ hasil.data.persentase }}">0%</div>
+                                    <div class="pct-label">Kemiripan</div>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                {% if "besar" in hasil.data.kesimpulan or "sedang" in hasil.data.kesimpulan %}
+                                <div class="result-badge match">
+                                    <i class="fa-solid fa-circle-check"></i>{{ hasil.data.kesimpulan }}
+                                </div>
+                                {% else %}
+                                <div class="result-badge nomatch">
+                                    <i class="fa-solid fa-circle-xmark"></i>{{ hasil.data.kesimpulan }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="col-4 text-center">
+                            <img src="{{ url_for('uploaded_file', filename=foto_dewasa) }}" class="preview-img"
+                                alt="Dewasa">
+                            <div class="preview-label">Foto Masa Dewasa</div>
+                        </div>
+                    </div>
+
+                    <div class="vector-box">
+                        <div class="vector-row">
+                            <span class="label">Dot Product (z₁ · z₂)</span>
+                            <span class="value">{{ hasil.data.dot_product }}</span>
+                        </div>
+                        <div class="vector-row">
+                            <span class="label">Norma Vektor A (‖z₁‖)</span>
+                            <span class="value">{{ hasil.data.norma_a }}</span>
+                        </div>
+                        <div class="vector-row">
+                            <span class="label">Norma Vektor B (‖z₂‖)</span>
+                            <span class="value">{{ hasil.data.norma_b }}</span>
+                        </div>
+                        <div class="vector-row highlight">
+                            <span class="label">Cosine Similarity </span>
+                            <span class="value">{{ hasil.data.cosine_similarity }}</span>
+                        </div>
+                        {% if hasil.metode == "pca" %}
+                        <div class="vector-row">
+                            <span class="label">Euclidean Distance</span>
+                            <span class="value">{{ hasil.data.euclidean_distance }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Pembuktian ringkas — tersembunyi, buka lewat tombol -->
+                    <div class="mt-3">
+                        <button class="btn-clear w-100 text-start" type="button" onclick="togglePembuktian(this)"
+                            style="display:flex; align-items:center; justify-content:space-between;">
+                            <span>
+                                <i class="fa-solid fa-flask me-2" style="color:var(--fm-pink);"></i>
+                                {% if hasil.metode == "pca" %}Lihat Pembuktian PCA/Eigenfaces{% else %}Lihat Pembuktian
+                                ArcFace{% endif %}
+                            </span>
+                            <i class="fa-solid fa-chevron-down"
+                                style="font-size:0.8rem; transition:transform 0.25s;"></i>
+                        </button>
+                        <div id="boxPembuktian" style="display:none; margin-top:0.5rem;">
+                            <div class="p-3 rounded-3"
+                                style="background:#f7f7fa; border:1px solid var(--fm-border); font-size:0.83rem; font-family:monospace; line-height:2;">
+                                {% if hasil.metode == "pca" %}
+                                Matriks X &nbsp;&nbsp;: {{ hasil.data.total_dataset }} × 10.000<br>
+                                Komponen &nbsp;: {{ hasil.data.n_components }} eigenfaces (SVD)<br>
+                                Xc = X − X̄ &nbsp;(centering mean face)<br>
+                                Z = Xc × Vk &nbsp;(proyeksi ke ruang PCA)<br>
+                                Cos Sim &nbsp;&nbsp;&nbsp;: {{ hasil.data.cosine_similarity }}<br>
+                                Threshold &nbsp;: 0.50 →
+                                {% if hasil.data.cosine_similarity >= 0.50 %}
+                                <span style="color:var(--fm-green); font-weight:700;">Mirip ✅</span>
+                                {% elif hasil.data.cosine_similarity >= 0.35 %}
+                                <span style="color:var(--fm-amber); font-weight:700;">Kemungkinan Mirip ⚠️</span>
+                                {% else %}
+                                <span style="color:#e74c3c; font-weight:700;">Tidak Mirip ❌</span>
+                                {% endif %}
+                                {% else %}
+                                Model &nbsp;&nbsp;&nbsp;&nbsp;: ArcFace (Deep Learning, 512 dimensi)<br>
+                                v₁ · v₂ &nbsp;&nbsp;&nbsp;: {{ hasil.data.dot_product }}<br>
+                                ‖v₁‖ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: {{ hasil.data.norma_a }}<br>
+                                ‖v₂‖ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: {{ hasil.data.norma_b }}<br>
+                                Cos Sim &nbsp;&nbsp;&nbsp;: {{ hasil.data.cosine_similarity }}<br>
+                                Keyakinan &nbsp;: {{ hasil.data.persentase }}%
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="meta-info-row">
+                        {% if hasil.metode == "pca" %}
+                        <div class="meta-info-pill">
+                            <span class="icon-circle-sm"><i class="fa-solid fa-vector-square"></i></span>
+                            <div>
+                                <div class="meta-value">{{ hasil.data.n_components }} Komponen</div>
+                                <div class="meta-label">PCA Eigenfaces</div>
+                            </div>
+                        </div>
+                        <div class="meta-info-pill">
+                            <span class="icon-circle-sm"><i class="fa-solid fa-database"></i></span>
+                            <div>
+                                <div class="meta-value">{{ hasil.data.total_dataset }}</div>
+                                <div class="meta-label">Foto Dataset Latih</div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="meta-info-pill">
+                            <span class="icon-circle-sm"><i class="fa-solid fa-robot"></i></span>
+                            <div>
+                                <div class="meta-value">512 Dimensi</div>
+                                <div class="meta-label">ArcFace Embedding</div>
+                            </div>
+                        </div>
+                        <div class="meta-info-pill">
+                            <span class="icon-circle-sm"><i class="fa-solid fa-brain"></i></span>
+                            <div>
+                                <div class="meta-value">Deep Learning</div>
+                                <div class="meta-label">Model Pretrained</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fa-solid fa-circle-user"></i>
+                        <p class="mb-1 fw-semibold text-dark">Belum ada foto yang dianalisis</p>
+                        <small>Unggah foto masa kecil dan masa dewasa pada panel di sebelah kiri untuk melihat hasil
+                            kemiripan wajah.</small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card main-card shadow-sm p-4 bg-white">
+                    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                        <div class="card-title-row mb-0"><i class="fa-solid fa-clock-rotate-left"></i>Riwayat Analisis
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="history-badge-count" id="historyCount">0 Data Tersimpan</span>
+                            <button type="button" class="btn-clear" id="btnClearHistory" style="display: none;">
+                                <i class="fa-solid fa-trash-can me-1"></i>Hapus Riwayat
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th width="5%">ID</th>
+                                    <th width="10%">Foto Kecil</th>
+                                    <th width="18%">Nama File Kecil</th>
+                                    <th width="10%">Foto Dewasa</th>
+                                    <th width="18%">Nama File Dewasa</th>
+                                    <th width="9%">Similarity</th>
+                                    <th width="10%">Metode</th>
+                                    <th width="9%">Status</th>
+                                    <th width="9%">Waktu</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyTableBody">
+                                <tr>
+                                    <td colspan="9" class="text-center py-4 text-muted">
+                                        <i class="fa-solid fa-inbox d-block mb-2 fs-3 text-black-50"></i>
+                                        Belum ada riwayat pengujian data.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4" id="chartContainer" style="display: none;">
+            <div class="col-12">
+                <div class="card main-card shadow-sm p-4 bg-white">
+                    <div class="card-title-row"><i class="fa-solid fa-chart-line"></i>Tren Similarity dari Riwayat</div>
+                    <div class="chart-wrap">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                    <div class="chart-stats">
+                        <div class="chart-stat">
+                            <div class="stat-value" id="statAvg">0%</div>
+                            <div class="stat-label">Rata-rata Similarity</div>
+                        </div>
+                        <div class="chart-stat">
+                            <div class="stat-value" id="statMax">0%</div>
+                            <div class="stat-label">Tertinggi</div>
+                        </div>
+                        <div class="chart-stat">
+                            <div class="stat-value" id="statSame">0</div>
+                            <div class="stat-label">Hasil "Sama"</div>
+                        </div>
+                        <div class="chart-stat">
+                            <div class="stat-value" id="statDiff">0</div>
+                            <div class="stat-label">Hasil "Tidak Mirip"</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4 g-4">
+            <div class="col-lg-5">
+                <div class="info-strip h-100">
+                    <h6><span class="icon-circle"><i class="fa-solid fa-lightbulb"></i></span>Konsep Aljabar Linear yang
+                        Digunakan</h6>
+                    <div>
+                        <span class="concept-pill"><i class="fa-solid fa-circle-check"></i>Matriks (Representasi
+                            Pixel)</span>
+                        <span class="concept-pill"><i class="fa-solid fa-circle-check"></i>Vektor (Flatten /
+                            Embedding)</span>
+                        <span class="concept-pill"><i class="fa-solid fa-circle-check"></i>Dot Product</span>
+                        <span class="concept-pill"><i class="fa-solid fa-circle-check"></i>Norma Vektor</span>
+                        <span class="concept-pill"><i class="fa-solid fa-circle-check"></i>Cosine Similarity</span>
+                        <span class="concept-pill"><i class="fa-solid fa-circle-check"></i>PCA / Eigenfaces</span>
+                        <span class="concept-pill"><i class="fa-solid fa-circle-check"></i>SVD (Xc = UΣVᵀ)</span>
+                        <span class="concept-pill"><i class="fa-solid fa-circle-check"></i>Reduksi Dimensi</span>
+                        <span class="concept-pill"><i class="fa-solid fa-circle-check"></i>Euclidean Distance</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <div class="info-strip h-100">
+                    <h6><span class="icon-circle"><i class="fa-solid fa-circle-exclamation"></i></span>Catatan
+                        Penggunaan</h6>
+
+                    <div style="font-size:0.87rem; color:var(--fm-dark); line-height:1.7;">
+                        <div
+                            style="background:var(--fm-green-bg); border:1px solid #c7ecdb; border-radius:10px; padding:0.65rem 0.85rem; margin-bottom:0.7rem;">
+                            <div
+                                style="font-weight:700; color:var(--fm-green); font-size:0.82rem; margin-bottom:0.25rem;">
+                                <i class="fa-solid fa-layer-group me-1"></i>PCA / Eigenfaces
+                            </div>
+                            <div style="color:#444; font-size:0.82rem;">
+                                Metode Aljabar Linear klasik berbasis reduksi dimensi (SVD). Tujuannya untuk mendeteksi
+                                kemiripan wajah melalui proyeksi ke ruang eigenfaces.
+                                <br><br>
+                                <span style="color:#c0392b; font-weight:600;">⚠ Keterbatasan:</span> PCA sensitif
+                                terhadap perubahan pencahayaan, posisi, dan ekspresi wajah. Untuk foto lintas usia yang
+                                berbeda jauh, akurasi PCA terbatas karena perubahan struktur wajah bersifat non-linear —
+                                berbeda dengan kemampuan deep learning.
+                            </div>
+                        </div>
+                        <div
+                            style="background:#e8eeff; border:1px solid #c5cef7; border-radius:10px; padding:0.65rem 0.85rem;">
+                            <div style="font-weight:700; color:#4a6cf7; font-size:0.82rem; margin-bottom:0.25rem;">
+                                <i class="fa-solid fa-robot me-1"></i>ArcFace (Deep Learning)
+                            </div>
+                            <div style="color:#444; font-size:0.82rem;">
+                                Model deep learning pretrained dari jutaan foto. Lebih akurat untuk perbandingan wajah
+                                lintas usia karena mampu mengenali pola wajah yang tidak berubah meski usia berbeda.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bundle.min.js"></script>
+
+    <script>
+        let trendChartInstance = null;
+
+        // ---------- Fungsi Mengambil dan Mengatur Riwayat via LocalStorage ----------
+        function dapatkanRiwayat() {
+            const data = localStorage.getItem('facematch_history');
+            return data ? JSON.parse(data) : [];
+        }
+
+        function simpanRiwayat(data) {
+            localStorage.setItem('facematch_history', JSON.stringify(data));
+        }
+
+        // ---------- Rendering Komponen Riwayat (Tabel & Chart) ----------
+        function renderRiwayat() {
+            const riwayatData = dapatkanRiwayat();
+            const tableBody = document.getElementById('historyTableBody');
+            const historyCountBadge = document.getElementById('historyCount');
+            const btnClear = document.getElementById('btnClearHistory');
+            const chartContainer = document.getElementById('chartContainer');
+
+            historyCountBadge.textContent = `${riwayatData.length} Data Tersimpan`;
+
+            if (riwayatData.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">
+                            <i class="fa-solid fa-inbox d-block mb-2 fs-3 text-black-50"></i>
+                            Belum ada riwayat pengujian data.
+                        </td>
+                    </tr>`;
+                btnClear.style.display = 'none';
+                chartContainer.style.display = 'none';
+                return;
+            }
+
+            btnClear.style.display = 'inline-block';
+            chartContainer.style.display = 'block';
+
+            tableBody.innerHTML = riwayatData.map(item => `
+                <tr>
+                    <td><span class="text-secondary fw-semibold">#${item.id}</span></td>
+                    <td><img src="/uploads/${item.foto_kecil}" class="thumb-history" alt="kecil"></td>
+                    <td><small class="text-truncate d-inline-block text-muted" style="max-width: 160px;">${item.foto_kecil}</small></td>
+                    <td><img src="/uploads/${item.foto_dewasa}" class="thumb-history" alt="dewasa"></td>
+                    <td><small class="text-truncate d-inline-block text-muted" style="max-width: 160px;">${item.foto_dewasa}</small></td>
+                    <td><span class="fw-bold" style="color: var(--fm-pink);">${item.persentase}%</span></td>
+                    <td>
+                        <span class="method-badge ${item.metode === 'pca' ? 'pca' : 'arcface'}">
+                            ${item.metode === 'pca' ? 'PCA' : 'ArcFace'}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge-status ${item.status === 'Sama' ? 'same' : 'diff'}">
+                            ${item.status === 'Sama' ? 'Sama' : 'Tidak Mirip'}
+                        </span>
+                    </td>
+                    <td><small class="text-black-50">${item.tanggal}</small></td>
+                </tr>
+            `).join('');
+
+            // Render ChartJS
+            const dataKronologis = [...riwayatData].reverse();
+            const labels = dataKronologis.map(item => '#' + item.id);
+            const values = dataKronologis.map(item => parseFloat(item.persentase));
+
+            const trendCanvas = document.getElementById('trendChart');
+            if (trendCanvas) {
+                if (trendChartInstance) {
+                    trendChartInstance.destroy();
+                }
+
+                trendChartInstance = new Chart(trendCanvas, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Similarity (%)',
+                            data: values,
+                            borderColor: '#ec4f7f',
+                            backgroundColor: 'rgba(236, 79, 127, 0.1)',
+                            borderWidth: 2.5,
+                            pointBackgroundColor: '#ec4f7f',
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            tension: 0.35,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: (ctx) => 'Similarity: ' + ctx.parsed.y + '%'
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                ticks: { callback: (v) => v + '%' },
+                                grid: { color: '#ececf3' }
+                            },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+            }
+
+            // Hitung Statistik Ringkas
+            const total = riwayatData.length;
+            const avg = (values.reduce((a, b) => a + b, 0) / total).toFixed(2);
+            const max = Math.max(...values).toFixed(2);
+            const same = riwayatData.filter(item => item.status === 'Sama').length;
+            const diff = total - same;
+
+            document.getElementById('statAvg').textContent = avg + '%';
+            document.getElementById('statMax').textContent = max + '%';
+            document.getElementById('statSame').textContent = same;
+            document.getElementById('statDiff').textContent = diff;
+        }
+
+        // ---------- Logika Menangkap Hasil Analisis Baru (Jinja2 Template Injection) ----------
+        {% if hasil and hasil.status == "ok" %}
+        (function () {
+            const riwayatSaatIni = dapatkanRiwayat();
+
+            const nilaiPersen = parseFloat("{{ hasil.data.persentase }}");
+            const kesimpulanText = "{{ hasil.data.kesimpulan }}";
+            const metodeDigunakan = "{{ hasil.metode }}";
+            const penandaStatus = (kesimpulanText.includes("besar") || kesimpulanText.includes("sedang")) ? "Sama" : "Tidak Mirip";
+
+            const nextId = riwayatSaatIni.length > 0 ? Math.max(...riwayatSaatIni.map(o => o.id)) + 1 : 1;
+
+            const sekarang = new Date();
+            const waktuFormat = sekarang.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) + ' ' +
+                sekarang.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+            const dataBaru = {
+                id: nextId,
+                foto_kecil: "{{ foto_kecil }}",
+                foto_dewasa: "{{ foto_dewasa }}",
+                persentase: nilaiPersen.toFixed(2),
+                metode: metodeDigunakan,
+                status: penandaStatus,
+                tanggal: waktuFormat
+            };
+
+            const sudahAda = riwayatSaatIni.some(item =>
+                item.foto_kecil === dataBaru.foto_kecil &&
+                item.foto_dewasa === dataBaru.foto_dewasa &&
+                item.persentase === dataBaru.persentase &&
+                item.metode === dataBaru.metode
+            );
+
+            if (!sudahAda) {
+                riwayatSaatIni.unshift(dataBaru);
+                simpanRiwayat(riwayatSaatIni);
+            }
+        })();
+        {% endif %}
+
+        // ---------- Animasi Counter Persentase Kemiripan ----------
+        const pctCounter = document.getElementById('pctCounter');
+        const gaugeFg = document.getElementById('gaugeFg');
+
+        if (pctCounter && gaugeFg) {
+            const target = parseFloat(pctCounter.dataset.target) || 0;
+            const circumference = 427.26;
+            const duration = 1200; // ms
+            const startTime = performance.now();
+
+            function animateCounter(now) {
+                const elapsed = now - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const currentValue = target * eased;
+
+                pctCounter.textContent = currentValue.toFixed(2) + '%';
+                gaugeFg.style.strokeDashoffset = circumference - (circumference * (currentValue / 100));
+
+                if (progress < 1) {
+                    requestAnimationFrame(animateCounter);
+                } else {
+                    pctCounter.textContent = target.toFixed(2) + '%';
+                    gaugeFg.style.strokeDashoffset = circumference - (circumference * (target / 100));
+                }
+            }
+            requestAnimationFrame(animateCounter);
+        }
+
+        // ---------- Event Listener Tombol Hapus Riwayat ----------
+        document.getElementById('btnClearHistory').addEventListener('click', function () {
+            if (confirm('Apakah Anda yakin ingin menghapus seluruh riwayat analisis dari browser?')) {
+                localStorage.removeItem('facematch_history');
+                renderRiwayat();
+            }
+        });
+
+        // ---------- Toggle Pembuktian ----------
+        function togglePembuktian(btn) {
+            const box = document.getElementById('boxPembuktian');
+            const icon = btn.querySelector('.fa-chevron-down');
+            if (!box) return;
+            const buka = box.style.display === 'none';
+            box.style.display = buka ? 'block' : 'none';
+            icon.style.transform = buka ? 'rotate(180deg)' : 'rotate(0deg)';
+            btn.querySelector('span').childNodes[1].textContent = buka
+                ? btn.querySelector('span').childNodes[1].textContent.replace('Lihat', 'Sembunyikan')
+                : btn.querySelector('span').childNodes[1].textContent.replace('Sembunyikan', 'Lihat');
+        }
+
+        // ---------- Toggle Threshold Box ----------
+        function updateThresholdVisibility() {
+            const isPca = document.getElementById('metode_pca').checked;
+            document.getElementById('threshold-box').style.display = isPca ? 'block' : 'none';
+        }
+        document.getElementById('metode_pca').addEventListener('change', updateThresholdVisibility);
+        document.getElementById('metode_arcface').addEventListener('change', updateThresholdVisibility);
+        updateThresholdVisibility();
+
+        // Jalankan render riwayat setiap kali halaman selesai dimuat
+        document.addEventListener('DOMContentLoaded', renderRiwayat);
+    </script>
+</body>
+
+</html>
