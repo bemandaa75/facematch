@@ -189,86 +189,115 @@ CSS = """
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
-:root{--fm-pink:#ec4f7f;--fm-pink-light:#fde7ee;--fm-bg:#f7f7fa;--fm-dark:#2b2d3a;--fm-muted:#8c8fa3;--fm-border:#ececf3;--fm-green:#2bb673;--fm-green-bg:#e8f8f0;--fm-amber:#e0a13a;--fm-amber-bg:#fdf2e2;}
-html,body{background-color:var(--fm-bg) !important;font-family:'Inter','Segoe UI',sans-serif;color:var(--fm-dark) !important;margin:0;color-scheme:light !important;}
+:root{
+  --fm-pink:#ec4f7f;--fm-pink-2:#f47b9d;--fm-pink-light:#fde7ee;--fm-pink-border:#fbd2e0;
+  --fm-bg:#f4f5f9;--fm-dark:#1e2030;--fm-muted:#8c8fa3;--fm-border:#e8eaf0;
+  --fm-green:#2bb673;--fm-green-bg:#e6f9f1;--fm-green-border:#b8edd4;
+  --fm-blue:#4a6cf7;--fm-blue-bg:#eef0fe;
+  --fm-shadow:0 2px 12px rgba(44,47,73,0.07);
+  --fm-shadow-lg:0 8px 32px rgba(44,47,73,0.12);
+}
+html,body{background:var(--fm-bg) !important;font-family:'Inter',sans-serif;color:var(--fm-dark) !important;margin:0;padding:0;color-scheme:light !important;}
 h1,h2,h3,h4,h5,h6{font-family:'Poppins',sans-serif;}
-.header-section{text-align:center;margin-bottom:2rem;}
-.header-logo{display:inline-flex;align-items:center;justify-content:center;gap:0.85rem;}
-.header-icon-badge{width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,var(--fm-pink) 0%,#f47b9d 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.6rem;box-shadow:0 8px 20px rgba(236,79,127,0.25);}
-.header-section h1{font-weight:800;font-size:2.5rem;letter-spacing:-0.02em;margin-bottom:0;color:var(--fm-dark);}
-.header-section p{color:var(--fm-muted);font-size:1rem;margin-top:0.35rem;}
-.header-divider{width:90px;height:3px;border-radius:3px;background:linear-gradient(90deg,transparent,var(--fm-pink),transparent);margin:1.25rem auto 0;}
-.main-card{border:1px solid var(--fm-border);border-radius:18px;background:#ffffff;}
-.card-title-row{display:flex;align-items:center;gap:0.6rem;font-weight:700;color:var(--fm-dark);font-size:1.05rem;margin-bottom:1.5rem;}
-.card-title-row i{color:var(--fm-pink);}
-.preview-img{max-height:200px;width:100%;object-fit:cover;border-radius:14px;box-shadow:0 4px 14px rgba(0,0,0,0.06);border:1px solid var(--fm-border);}
-.preview-label{font-size:0.8rem;font-weight:600;color:var(--fm-muted);margin-top:0.5rem;}
-.gauge-wrap{position:relative;width:170px;height:170px;margin:0 auto;}
+
+/* === CARDS === */
+.fm-card{background:#fff;border:1px solid var(--fm-border);border-radius:20px;padding:1.6rem;box-shadow:var(--fm-shadow);}
+.fm-card-title{display:flex;align-items:center;gap:0.6rem;font-weight:700;font-size:1.05rem;margin-bottom:1.4rem;color:var(--fm-dark);}
+.fm-card-title .ti{width:34px;height:34px;border-radius:10px;background:var(--fm-pink-light);color:var(--fm-pink);display:flex;align-items:center;justify-content:center;font-size:0.95rem;flex-shrink:0;}
+
+/* === PHOTOS === */
+.photo-frame{border-radius:16px;overflow:hidden;border:2px solid var(--fm-border);box-shadow:var(--fm-shadow);aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;background:#f9f9fc;}
+.photo-frame img{width:100%;height:100%;object-fit:cover;}
+.photo-label{font-size:0.78rem;font-weight:600;color:var(--fm-muted);margin-top:0.6rem;text-transform:uppercase;letter-spacing:0.05em;}
+
+/* === GAUGE === */
+.gauge-wrap{position:relative;width:160px;height:160px;margin:0 auto;}
 .gauge-wrap svg{transform:rotate(-90deg);}
-.gauge-bg{fill:none;stroke:var(--fm-border);stroke-width:14;}
-.gauge-fg{fill:none;stroke:var(--fm-pink);stroke-width:14;stroke-linecap:round;transition:stroke-dashoffset 0.8s ease;}
+.gauge-bg{fill:none;stroke:var(--fm-border);stroke-width:13;}
+.gauge-fg{fill:none;stroke:var(--fm-pink);stroke-width:13;stroke-linecap:round;}
 .gauge-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
-.gauge-center .pct{font-size:1.35rem;font-weight:800;font-family:'Poppins',sans-serif;color:var(--fm-dark);}
-.gauge-center .pct-label{font-size:0.78rem;color:var(--fm-muted);font-weight:600;letter-spacing:0.04em;text-transform:uppercase;}
-.result-badge{font-size:0.95rem;font-weight:700;padding:0.7rem 1.25rem;border-radius:30px;display:inline-flex;align-items:center;gap:0.5rem;}
-.result-badge.match{background:var(--fm-green-bg);color:var(--fm-green);border:1px solid #c7ecdb;}
-.result-badge.nomatch{background:var(--fm-pink-light);color:var(--fm-pink);border:1px solid #fbd2e0;}
-.vector-box{border-radius:14px;padding:1.1rem 1.25rem;background:var(--fm-pink-light);border:1px solid #fbd2e0;}
-.vector-row{display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0;border-bottom:1px solid rgba(0,0,0,0.05);font-size:0.92rem;}
+.gauge-pct{font-size:1.5rem;font-weight:800;font-family:'Poppins',sans-serif;color:var(--fm-dark);line-height:1;}
+.gauge-lbl{font-size:0.7rem;color:var(--fm-muted);font-weight:600;letter-spacing:0.06em;text-transform:uppercase;margin-top:0.2rem;}
+
+/* === RESULT BADGE === */
+.result-badge{display:inline-flex;align-items:center;gap:0.5rem;padding:0.6rem 1.1rem;border-radius:30px;font-weight:700;font-size:0.85rem;line-height:1.3;text-align:center;}
+.result-badge.match{background:var(--fm-green-bg);color:var(--fm-green);border:1px solid var(--fm-green-border);}
+.result-badge.nomatch{background:var(--fm-pink-light);color:var(--fm-pink);border:1px solid var(--fm-pink-border);}
+
+/* === VECTOR BOX === */
+.vector-box{background:linear-gradient(135deg,#fff5f8 0%,#fde7ee 100%);border:1px solid var(--fm-pink-border);border-radius:16px;padding:1rem 1.2rem;margin-top:1.1rem;}
+.vector-row{display:flex;justify-content:space-between;align-items:center;padding:0.42rem 0;border-bottom:1px solid rgba(236,79,127,0.1);font-size:0.88rem;}
 .vector-row:last-child{border-bottom:none;}
-.vector-row .label{color:var(--fm-muted);font-weight:500;}
-.vector-row .value{font-weight:700;color:var(--fm-dark);font-family:'Poppins',sans-serif;}
-.vector-row.highlight .label,.vector-row.highlight .value{color:var(--fm-pink);font-size:1.05rem;}
-.meta-info-row{display:flex;gap:0.75rem;margin-top:1rem;flex-wrap:wrap;}
-.meta-info-pill{display:flex;align-items:center;gap:0.6rem;background:var(--fm-bg);border:1px solid var(--fm-border);border-radius:12px;padding:0.6rem 0.9rem;font-size:0.85rem;flex:1;min-width:160px;}
-.meta-info-pill .icon-circle-sm{width:32px;height:32px;border-radius:9px;background:var(--fm-pink-light);color:var(--fm-pink);display:flex;align-items:center;justify-content:center;font-size:0.85rem;flex-shrink:0;}
-.meta-info-pill .meta-value{font-weight:700;font-family:'Poppins',sans-serif;color:var(--fm-dark);font-size:0.95rem;line-height:1.1;}
-.meta-info-pill .meta-label{color:var(--fm-muted);font-size:0.75rem;}
-.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3.5rem 1rem;color:var(--fm-muted);text-align:center;}
-.empty-state i{font-size:2.6rem;margin-bottom:1rem;color:#d8dae6;}
-.info-strip{border-radius:16px;border:1px solid var(--fm-border);background:#ffffff;padding:1.4rem 1.6rem;}
-.info-strip h6{font-weight:700;display:flex;align-items:center;gap:0.5rem;margin-bottom:0.9rem;color:var(--fm-dark);}
-.info-strip .icon-circle{width:36px;height:36px;border-radius:10px;background:var(--fm-pink-light);color:var(--fm-pink);display:flex;align-items:center;justify-content:center;font-size:0.95rem;}
-.concept-pill{display:inline-flex;align-items:center;gap:0.45rem;font-size:0.85rem;color:var(--fm-dark);font-weight:500;background:var(--fm-bg);border:1px solid var(--fm-border);border-radius:30px;padding:0.4rem 0.9rem;margin:0.2rem;}
-.concept-pill i{color:var(--fm-green);}
-.method-badge{font-size:0.75rem;font-weight:700;padding:0.2rem 0.6rem;border-radius:20px;display:inline-block;}
-.method-badge.arcface{background:#e8eeff;color:#4a6cf7;}
-.method-badge.pca{background:#e8f8f0;color:var(--fm-green);}
-.btn-clear{background:#fff;border:1px solid var(--fm-border);color:var(--fm-muted);font-weight:600;font-size:0.85rem;border-radius:10px;padding:0.45rem 1rem;cursor:pointer;}
-.btn-clear:hover{border-color:var(--fm-pink);color:var(--fm-pink);}
-.history-badge-count{background:var(--fm-pink-light);color:var(--fm-pink);font-weight:700;border-radius:30px;padding:0.35rem 1rem;font-size:0.85rem;}
-.table thead th{font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--fm-muted);font-weight:700;border-bottom:1px solid var(--fm-border);background:transparent;}
-.table tbody td{font-size:0.9rem;vertical-align:middle;border-bottom:1px solid var(--fm-border);}
-.badge-status{font-size:0.78rem;font-weight:700;padding:0.35rem 0.75rem;border-radius:8px;}
+.vector-row .lbl{color:var(--fm-muted);font-weight:500;}
+.vector-row .val{font-weight:700;font-family:'Poppins',sans-serif;color:var(--fm-dark);}
+.vector-row.hl .lbl{color:var(--fm-pink);font-weight:600;}
+.vector-row.hl .val{color:var(--fm-pink);font-size:1.05rem;}
+
+/* === METHOD BADGE === */
+.method-chip{display:inline-flex;align-items:center;gap:0.4rem;padding:0.3rem 0.75rem;border-radius:20px;font-size:0.75rem;font-weight:700;margin-bottom:1rem;}
+.method-chip.pca{background:var(--fm-green-bg);color:var(--fm-green);border:1px solid var(--fm-green-border);}
+.method-chip.arcface{background:var(--fm-blue-bg);color:var(--fm-blue);border:1px solid #c5cef7;}
+
+/* === META PILLS === */
+.meta-row{display:flex;gap:0.6rem;margin-top:1rem;flex-wrap:wrap;}
+.meta-pill{display:flex;align-items:center;gap:0.5rem;background:var(--fm-bg);border:1px solid var(--fm-border);border-radius:12px;padding:0.5rem 0.8rem;flex:1;min-width:140px;}
+.meta-pill .mic{width:28px;height:28px;border-radius:8px;background:var(--fm-pink-light);color:var(--fm-pink);display:flex;align-items:center;justify-content:center;font-size:0.78rem;flex-shrink:0;}
+.meta-pill .mv{font-weight:700;font-family:'Poppins',sans-serif;font-size:0.88rem;line-height:1.1;color:var(--fm-dark);}
+.meta-pill .ml{font-size:0.72rem;color:var(--fm-muted);}
+
+/* === PEMBUKTIAN === */
+.pembuktian-btn{width:100%;display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid var(--fm-border);border-radius:12px;padding:0.6rem 1rem;cursor:pointer;font-size:0.85rem;font-weight:600;color:var(--fm-dark);margin-top:1rem;transition:border-color 0.2s,background 0.2s;}
+.pembuktian-btn:hover{border-color:var(--fm-pink);background:var(--fm-pink-light);}
+.pembuktian-btn .chev{font-size:0.78rem;transition:transform 0.25s;color:var(--fm-muted);}
+.pembuktian-box{display:none;margin-top:0.5rem;background:#f8f9fc;border:1px solid var(--fm-border);border-radius:12px;padding:1rem 1.2rem;font-size:0.82rem;font-family:'Courier New',monospace;line-height:1.9;color:var(--fm-dark);}
+
+/* === EMPTY STATE === */
+.empty-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3rem 1rem;text-align:center;}
+.empty-icon{width:80px;height:80px;border-radius:50%;background:var(--fm-bg);border:2px dashed var(--fm-border);display:flex;align-items:center;justify-content:center;margin:0 auto 1.2rem;font-size:2rem;color:#c8cad8;}
+.empty-title{font-weight:700;font-size:1rem;color:var(--fm-dark);margin-bottom:0.3rem;}
+.empty-sub{font-size:0.85rem;color:var(--fm-muted);}
+
+/* === TABLE === */
+.fm-table thead th{font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--fm-muted);font-weight:700;border-bottom:2px solid var(--fm-border);padding:0.6rem 0.8rem;background:transparent;}
+.fm-table tbody td{font-size:0.88rem;vertical-align:middle;border-bottom:1px solid var(--fm-border);padding:0.7rem 0.8rem;}
+.fm-table tbody tr:last-child td{border-bottom:none;}
+.fm-table tbody tr:hover td{background:#fafbff;}
+.badge-status{font-size:0.76rem;font-weight:700;padding:0.28rem 0.65rem;border-radius:8px;}
 .badge-status.same{background:var(--fm-green-bg);color:var(--fm-green);}
 .badge-status.diff{background:var(--fm-pink-light);color:var(--fm-pink);}
-.chart-wrap{position:relative;height:240px;}
-.chart-stats{display:flex;gap:0.75rem;margin-top:1rem;flex-wrap:wrap;}
-.chart-stat{flex:1;min-width:130px;background:var(--fm-bg);border:1px solid var(--fm-border);border-radius:12px;padding:0.75rem 1rem;text-align:center;}
-.chart-stat .stat-value{font-family:'Poppins',sans-serif;font-weight:800;font-size:1.3rem;color:var(--fm-pink);}
-.chart-stat .stat-label{color:var(--fm-muted);font-size:0.78rem;font-weight:600;text-transform:uppercase;letter-spacing:0.03em;}
-/* Upload card */
-.upload-section-label{font-size:0.88rem;font-weight:600;color:var(--fm-dark);margin-bottom:0.45rem;}
-.upload-box{border:1.5px dashed var(--fm-border);border-radius:14px;padding:1.1rem 1rem 0.85rem;background:#fafafa;text-align:center;transition:border-color 0.2s,background 0.2s;cursor:pointer;}
-.upload-box:hover,.upload-box.has-file{border-color:var(--fm-pink);background:var(--fm-pink-light);}
-.upload-box .icon-circle-upload{width:48px;height:48px;border-radius:50%;background:var(--fm-pink-light);display:inline-flex;align-items:center;justify-content:center;margin-bottom:0.6rem;}
-.upload-file-row{display:inline-flex;align-items:center;border-radius:7px;overflow:hidden;border:1px solid #d1d5db;font-size:0.8rem;background:#fff;margin-top:0.5rem;}
-.upload-file-row .choose-btn{background:#f3f4f6;color:#374151;font-weight:600;padding:0.35rem 0.8rem;border-right:1px solid #d1d5db;cursor:pointer;white-space:nowrap;}
-.upload-file-row .file-name{color:#6b7280;padding:0.35rem 0.7rem;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-/* Method select */
-.method-cards{display:flex;gap:0.75rem;margin-bottom:1.1rem;}
-.method-card{flex:1;border:2px solid var(--fm-border);border-radius:14px;padding:0.85rem 0.5rem;text-align:center;cursor:pointer;background:#fff;transition:border-color 0.2s,background 0.2s;user-select:none;}
-.method-card.active{border-color:var(--fm-pink);background:var(--fm-pink-light);}
-.method-card .mc-icon{font-size:1.3rem;margin-bottom:0.3rem;}
-.method-card .mc-title{font-weight:700;font-size:0.82rem;color:var(--fm-dark);}
-.method-card .mc-sub{font-size:0.72rem;color:var(--fm-muted);}
-/* Analisis button */
-.btn-analisis{width:100%;background:linear-gradient(135deg,#ec4f7f,#f47b9d);color:#fff;border:none;border-radius:12px;font-weight:700;font-size:0.95rem;padding:0.8rem 1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:0.5rem;transition:opacity 0.2s,box-shadow 0.2s;font-family:'Poppins',sans-serif;}
-.btn-analisis:hover{opacity:0.92;box-shadow:0 4px 16px rgba(236,79,127,0.35);}
-.btn-analisis:disabled{opacity:0.55;cursor:not-allowed;}
-/* Loading overlay */
-.loading-overlay{display:none;text-align:center;padding:2rem;color:var(--fm-pink);}
-.spinner{width:40px;height:40px;border:4px solid var(--fm-pink-light);border-top-color:var(--fm-pink);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 1rem;}
+.badge-metode{font-size:0.74rem;font-weight:700;padding:0.22rem 0.6rem;border-radius:8px;}
+.badge-metode.pca{background:var(--fm-green-bg);color:var(--fm-green);}
+.badge-metode.arcface{background:var(--fm-blue-bg);color:var(--fm-blue);}
+
+/* === CHART === */
+.chart-wrap{position:relative;height:220px;}
+.chart-stats{display:flex;gap:0.65rem;margin-top:1rem;flex-wrap:wrap;}
+.chart-stat{flex:1;min-width:120px;background:var(--fm-bg);border:1px solid var(--fm-border);border-radius:14px;padding:0.8rem 1rem;text-align:center;}
+.chart-stat .sv{font-family:'Poppins',sans-serif;font-weight:800;font-size:1.3rem;color:var(--fm-pink);}
+.chart-stat .sl{color:var(--fm-muted);font-size:0.74rem;font-weight:600;text-transform:uppercase;letter-spacing:0.03em;margin-top:0.1rem;}
+
+/* === CONCEPT PILLS === */
+.concept-pill{display:inline-flex;align-items:center;gap:0.4rem;font-size:0.82rem;color:var(--fm-dark);font-weight:500;background:var(--fm-bg);border:1px solid var(--fm-border);border-radius:30px;padding:0.35rem 0.85rem;margin:0.18rem;}
+.concept-pill i{color:var(--fm-green);font-size:0.75rem;}
+
+/* === HISTORY SECTION === */
+.section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;flex-wrap:wrap;gap:0.5rem;}
+.history-chip{background:var(--fm-pink-light);color:var(--fm-pink);font-weight:700;border-radius:30px;padding:0.28rem 0.85rem;font-size:0.82rem;}
+.btn-hapus{background:#fff;border:1px solid var(--fm-border);color:var(--fm-muted);font-weight:600;font-size:0.82rem;border-radius:10px;padding:0.38rem 0.85rem;cursor:pointer;display:flex;align-items:center;gap:0.4rem;}
+.btn-hapus:hover{border-color:#e74c3c;color:#e74c3c;}
+
+/* === INFO CARDS === */
+.info-card{background:#fff;border:1px solid var(--fm-border);border-radius:16px;padding:1.4rem;}
+.info-card h6{font-weight:700;display:flex;align-items:center;gap:0.5rem;margin-bottom:1rem;font-size:0.95rem;}
+.info-icon{width:34px;height:34px;border-radius:10px;background:var(--fm-pink-light);color:var(--fm-pink);display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;}
+.info-note{border-radius:12px;padding:0.7rem 0.9rem;font-size:0.82rem;line-height:1.6;margin-bottom:0.65rem;}
+.info-note:last-child{margin-bottom:0;}
+.info-note.pca-note{background:var(--fm-green-bg);border:1px solid var(--fm-green-border);}
+.info-note.arc-note{background:var(--fm-blue-bg);border:1px solid #c5cef7;}
+.note-title{font-weight:700;font-size:0.8rem;margin-bottom:0.2rem;}
+.note-title.pca{color:var(--fm-green);}
+.note-title.arc{color:var(--fm-blue);}
+
 @keyframes spin{to{transform:rotate(360deg)}}
 </style>
 """
@@ -288,7 +317,7 @@ if hasil and hasil.get("status") == "ok":
     circ = 427.26
     offset = circ - (circ * (pct / 100))
     metode_badge = '<span class="method-badge pca"><i class="fa-solid fa-layer-group me-1"></i>Metode: PCA / Eigenfaces</span>'
-    eucl_row = f'<div class="vector-row"><span class="label">Euclidean Distance</span><span class="value">{d.get("euclidean_distance","—")}</span></div>'
+    eucl_row = f'<div class="vector-row"><span class="lbl">Euclidean Distance</span><span class="val">{d.get("euclidean_distance","—")}</span></div>'
     sim = d["cosine_similarity"]
     thr = st.session_state.get("threshold", 0.60)
     if sim >= thr: sp = f'<span style="color:var(--fm-green);font-weight:700;">Mirip ✅</span>'
@@ -302,71 +331,71 @@ if hasil and hasil.get("status") == "ok":
     Cos Sim &nbsp;&nbsp;&nbsp;: {sim}<br>
     Threshold &nbsp;: {thr} → {sp}"""
     meta_html = f"""
-    <div class="meta-info-pill"><span class="icon-circle-sm"><i class="fa-solid fa-vector-square"></i></span>
-    <div><div class="meta-value">{d.get('n_components','—')} Komponen</div><div class="meta-label">PCA Eigenfaces</div></div></div>
-    <div class="meta-info-pill"><span class="icon-circle-sm"><i class="fa-solid fa-database"></i></span>
-    <div><div class="meta-value">{d.get('total_dataset','—')}</div><div class="meta-label">Foto Dataset Latih</div></div></div>
-    <div class="meta-info-pill"><span class="icon-circle-sm"><i class="fa-solid fa-sliders"></i></span>
-    <div><div class="meta-value">{thr}</div><div class="meta-label">Threshold Digunakan</div></div></div>"""
+    <div class="meta-pill"><span class="mic"><i class="fa-solid fa-vector-square"></i></span>
+    <div><div class="mv">{d.get('n_components','—')} Komponen</div><div class="ml">PCA Eigenfaces</div></div></div>
+    <div class="meta-pill"><span class="mic"><i class="fa-solid fa-database"></i></span>
+    <div><div class="mv">{d.get('total_dataset','—')}</div><div class="ml">Dataset Latih</div></div></div>
+    <div class="meta-pill"><span class="mic"><i class="fa-solid fa-sliders"></i></span>
+    <div><div class="mv">{thr}</div><div class="ml">Threshold</div></div></div>"""
 
     hasil_html = f"""
-    {metode_badge}
-    <div class="row g-3 align-items-center mb-4 mt-2">
-        <div class="col-4 text-center">
-            <img src="data:image/jpeg;base64,{img1_b64}" class="preview-img" alt="Kecil">
-            <div class="preview-label">Foto Masa Kecil</div>
-        </div>
-        <div class="col-4 text-center">
-            <div class="gauge-wrap">
-                <svg viewBox="0 0 160 160">
-                    <circle class="gauge-bg" cx="80" cy="80" r="68"></circle>
-                    <circle id="gaugeFg" class="gauge-fg" cx="80" cy="80" r="68"
-                        stroke-dasharray="427.26" stroke-dashoffset="427.26" data-target="{pct}"></circle>
-                </svg>
-                <div class="gauge-center">
-                    <div class="pct" id="pctCounter" data-target="{pct}">0%</div>
-                    <div class="pct-label">Kemiripan</div>
-                </div>
-            </div>
-            <div class="mt-3">
-                <div class="result-badge {badge_cls}">
-                    <i class="fa-solid {badge_icon}"></i>{d['kesimpulan']}
-                </div>
-            </div>
-        </div>
-        <div class="col-4 text-center">
-            <img src="data:image/jpeg;base64,{img2_b64}" class="preview-img" alt="Dewasa">
-            <div class="preview-label">Foto Masa Dewasa</div>
-        </div>
+    <div class="method-chip {'pca' if metode=='pca' else 'arcface'}">
+      <i class="fa-solid {'fa-layer-group' if metode=='pca' else 'fa-robot'}"></i>
+      Metode: {'PCA / Eigenfaces' if metode=='pca' else 'ArcFace (Deep Learning)'}
     </div>
+
+    <div class="row g-3 align-items-stretch mb-0">
+      <div class="col-4 text-center d-flex flex-column align-items-center">
+        <div class="photo-frame w-100"><img src="data:image/jpeg;base64,{img1_b64}" alt="Kecil"></div>
+        <div class="photo-label">Foto Masa Kecil</div>
+      </div>
+      <div class="col-4 d-flex flex-column align-items-center justify-content-center gap-3">
+        <div class="gauge-wrap">
+          <svg viewBox="0 0 160 160">
+            <circle class="gauge-bg" cx="80" cy="80" r="68"></circle>
+            <circle id="gaugeFg" class="gauge-fg" cx="80" cy="80" r="68"
+              stroke-dasharray="427.26" stroke-dashoffset="427.26"></circle>
+          </svg>
+          <div class="gauge-center">
+            <div class="gauge-pct" id="pctCounter" data-target="{pct}">0%</div>
+            <div class="gauge-lbl">Kemiripan</div>
+          </div>
+        </div>
+        <div class="result-badge {badge_cls} text-center" style="max-width:180px;">
+          <i class="fa-solid {badge_icon} flex-shrink-0"></i>
+          <span>{d['kesimpulan']}</span>
+        </div>
+      </div>
+      <div class="col-4 text-center d-flex flex-column align-items-center">
+        <div class="photo-frame w-100"><img src="data:image/jpeg;base64,{img2_b64}" alt="Dewasa"></div>
+        <div class="photo-label">Foto Masa Dewasa</div>
+      </div>
+    </div>
+
     <div class="vector-box">
-        <div class="vector-row"><span class="label">Dot Product (z₁ · z₂)</span><span class="value">{d['dot_product']}</span></div>
-        <div class="vector-row"><span class="label">Norma Vektor A (‖z₁‖)</span><span class="value">{d['norma_a']}</span></div>
-        <div class="vector-row"><span class="label">Norma Vektor B (‖z₂‖)</span><span class="value">{d['norma_b']}</span></div>
-        <div class="vector-row highlight"><span class="label">Cosine Similarity</span><span class="value">{d['cosine_similarity']}</span></div>
-        {eucl_row}
+      <div class="vector-row"><span class="lbl">Dot Product (z₁ · z₂)</span><span class="val">{d['dot_product']}</span></div>
+      <div class="vector-row"><span class="lbl">Norma Vektor A (‖z₁‖)</span><span class="val">{d['norma_a']}</span></div>
+      <div class="vector-row"><span class="lbl">Norma Vektor B (‖z₂‖)</span><span class="val">{d['norma_b']}</span></div>
+      <div class="vector-row hl"><span class="lbl">Cosine Similarity</span><span class="val">{d['cosine_similarity']}</span></div>
+      {eucl_row}
     </div>
-    <div class="mt-3">
-        <button class="btn-clear w-100 text-start" type="button" onclick="togglePembuktian(this)"
-            style="display:flex;align-items:center;justify-content:space-between;">
-            <span><i class="fa-solid fa-flask me-2" style="color:var(--fm-pink);"></i>
-            {"Lihat Pembuktian PCA/Eigenfaces" if metode=="pca" else "Lihat Pembuktian ArcFace"}</span>
-            <i class="fa-solid fa-chevron-down" style="font-size:0.8rem;transition:transform 0.25s;"></i>
-        </button>
-        <div id="boxPembuktian" style="display:none;margin-top:0.5rem;">
-            <div class="p-3 rounded-3" style="background:#f7f7fa;border:1px solid var(--fm-border);font-size:0.83rem;font-family:monospace;line-height:2;">
-                {pembuktian_html}
-            </div>
-        </div>
+
+    <button class="pembuktian-btn" onclick="togglePembuktian(this)">
+      <span><i class="fa-solid fa-flask me-2" style="color:var(--fm-pink);"></i>{"Lihat Pembuktian PCA/Eigenfaces" if metode=="pca" else "Lihat Pembuktian ArcFace"}</span>
+      <i class="fa-solid fa-chevron-down chev"></i>
+    </button>
+    <div id="boxPembuktian" class="pembuktian-box">
+      {pembuktian_html}
     </div>
-    <div class="meta-info-row">{meta_html}</div>
+
+    <div class="meta-row">{meta_html}</div>
     """
 else:
     hasil_html = """
-    <div class="empty-state">
-        <i class="fa-solid fa-circle-user"></i>
-        <p class="mb-1 fw-semibold text-dark">Belum ada foto yang dianalisis</p>
-        <small>Upload foto masa kecil dan masa dewasa lalu klik Analisis Kemiripan.</small>
+    <div class="empty-wrap">
+      <div class="empty-icon"><i class="fa-solid fa-face-viewfinder"></i></div>
+      <div class="empty-title">Belum ada foto yang dianalisis</div>
+      <div class="empty-sub">Upload foto masa kecil &amp; masa dewasa,<br>lalu klik <b>Analisis Kemiripan</b>.</div>
     </div>"""
 
 error_html = ""
@@ -473,26 +502,36 @@ with col_right:
 </div>
 <script>
 const pc=document.getElementById('pctCounter'),gf=document.getElementById('gaugeFg');
-if(pc&&gf){{const tg=parseFloat(pc.dataset.target)||0,ci=427.26,dur=1200,st0=performance.now();
-function anim(now){{const el=now-st0,pr=Math.min(el/dur,1),ea=1-Math.pow(1-pr,3),cv=tg*ea;
-pc.textContent=cv.toFixed(2)+'%';gf.style.strokeDashoffset=ci-(ci*(cv/100));
-if(pr<1)requestAnimationFrame(anim);else{{pc.textContent=tg.toFixed(2)+'%';gf.style.strokeDashoffset=ci-(ci*(tg/100));}}}}
-requestAnimationFrame(anim);}}
-function togglePembuktian(btn){{const box=document.getElementById('boxPembuktian'),ic=btn.querySelector('.fa-chevron-down');
-if(!box)return;const bk=box.style.display==='none';box.style.display=bk?'block':'none';
-ic.style.transform=bk?'rotate(180deg)':'rotate(0deg)';
-parent.postMessage({{type:'fm-resize'}}, '*');}}
-function fmReportHeight(){{
-    const root=document.getElementById('fm-resize-root');
-    if(!root) return;
-    const h=root.scrollHeight + 32;
-    window.parent.postMessage({{type:'streamlit:setFrameHeight',height:h}},'*');
+if(pc&&gf){{
+  const tg=parseFloat(pc.dataset.target)||0,ci=427.26,dur=1400,st0=performance.now();
+  function anim(now){{
+    const el=now-st0,pr=Math.min(el/dur,1),ea=1-Math.pow(1-pr,3),cv=tg*ea;
+    pc.textContent=cv.toFixed(2)+'%';gf.style.strokeDashoffset=ci-(ci*(cv/100));
+    if(pr<1)requestAnimationFrame(anim);
+    else{{pc.textContent=tg.toFixed(2)+'%';gf.style.strokeDashoffset=ci-(ci*(tg/100));}}
+  }}
+  requestAnimationFrame(anim);
 }}
-document.addEventListener('DOMContentLoaded', fmReportHeight);
-window.addEventListener('load', fmReportHeight);
-setTimeout(fmReportHeight, 100);
-setTimeout(fmReportHeight, 600);
-new ResizeObserver(fmReportHeight).observe(document.body);
+function fmReportHeight(){{
+  const root=document.getElementById('fm-resize-root');
+  if(!root)return;
+  const h=root.getBoundingClientRect().height+40;
+  window.parent.postMessage({{type:'streamlit:setFrameHeight',height:Math.ceil(h)}},'*');
+}}
+function togglePembuktian(btn){{
+  const box=document.getElementById('boxPembuktian');
+  const ic=btn.querySelector('.chev');
+  if(!box)return;
+  const opening=box.style.display==='none';
+  box.style.display=opening?'block':'none';
+  if(ic)ic.style.transform=opening?'rotate(180deg)':'rotate(0deg)';
+  setTimeout(fmReportHeight,50);
+  setTimeout(fmReportHeight,350);
+}}
+document.addEventListener('DOMContentLoaded',()=>{{setTimeout(fmReportHeight,120);setTimeout(fmReportHeight,600);}});
+window.addEventListener('load',fmReportHeight);
+const _obs=new ResizeObserver(()=>setTimeout(fmReportHeight,50));
+_obs.observe(document.getElementById('fm-resize-root')||document.body);
 </script>
 </body></html>"""
         _hasil_ada = hasil and hasil.get("status") == "ok"
@@ -514,85 +553,81 @@ BOTTOM_HTML = f"""
 </head><body style="background:transparent;padding:0;margin:0;">
 <div class="container-fluid px-0">
 
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card main-card shadow-sm p-4 bg-white">
-                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-                    <div class="card-title-row mb-0"><i class="fa-solid fa-clock-rotate-left"></i>Riwayat Analisis</div>
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="history-badge-count" id="historyCount">0 Data Tersimpan</span>
-                        <button type="button" class="btn-clear" id="btnClearHistory" style="display:none;">
-                            <i class="fa-solid fa-trash-can me-1"></i>Hapus Riwayat
-                        </button>
-                    </div>
-                </div>
-                <div class="table-responsive">
-                    <table class="table align-middle mb-0">
-                        <thead><tr>
-                            <th>ID</th><th>Nama File Kecil</th><th>Nama File Dewasa</th>
-                            <th>Similarity</th><th>Metode</th><th>Status</th><th>Waktu</th>
-                        </tr></thead>
-                        <tbody id="historyTableBody">
-                            <tr><td colspan="7" class="text-center py-4 text-muted">
-                                <i class="fa-solid fa-inbox d-block mb-2 fs-3 text-black-50"></i>
-                                Belum ada riwayat pengujian data.
-                            </td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+  <!-- RIWAYAT -->
+  <div class="fm-card mb-4">
+    <div class="section-head">
+      <div class="fm-card-title mb-0">
+        <span class="ti"><i class="fa-solid fa-clock-rotate-left"></i></span>Riwayat Analisis
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <span class="history-chip" id="historyCount">0 Data Tersimpan</span>
+        <button class="btn-hapus" id="btnClearHistory" style="display:none;" onclick="clearHistory()">
+          <i class="fa-solid fa-trash-can"></i>Hapus
+        </button>
+      </div>
     </div>
+    <div class="table-responsive">
+      <table class="fm-table w-100">
+        <thead><tr>
+          <th>ID</th><th>File Kecil</th><th>File Dewasa</th>
+          <th>Similarity</th><th>Metode</th><th>Status</th><th>Waktu</th>
+        </tr></thead>
+        <tbody id="historyTableBody">
+          <tr><td colspan="7" class="text-center py-4" style="color:#c8cad8;">
+            <i class="fa-solid fa-inbox d-block mb-2 fs-3"></i>Belum ada riwayat.
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 
-    <div class="row mb-4" id="chartContainer" style="display:none;">
-        <div class="col-12">
-            <div class="card main-card shadow-sm p-4 bg-white">
-                <div class="card-title-row"><i class="fa-solid fa-chart-line"></i>Tren Similarity dari Riwayat</div>
-                <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
-                <div class="chart-stats">
-                    <div class="chart-stat"><div class="stat-value" id="statAvg">0%</div><div class="stat-label">Rata-rata Similarity</div></div>
-                    <div class="chart-stat"><div class="stat-value" id="statMax">0%</div><div class="stat-label">Tertinggi</div></div>
-                    <div class="chart-stat"><div class="stat-value" id="statSame">0</div><div class="stat-label">Hasil "Sama"</div></div>
-                    <div class="chart-stat"><div class="stat-value" id="statDiff">0</div><div class="stat-label">Hasil "Tidak Mirip"</div></div>
-                </div>
-            </div>
-        </div>
+  <!-- CHART -->
+  <div class="fm-card mb-4" id="chartContainer" style="display:none;">
+    <div class="fm-card-title">
+      <span class="ti"><i class="fa-solid fa-chart-line"></i></span>Tren Similarity dari Riwayat
     </div>
+    <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
+    <div class="chart-stats">
+      <div class="chart-stat"><div class="sv" id="statAvg">0%</div><div class="sl">Rata-rata</div></div>
+      <div class="chart-stat"><div class="sv" id="statMax">0%</div><div class="sl">Tertinggi</div></div>
+      <div class="chart-stat"><div class="sv" id="statSame">0</div><div class="sl">Hasil Sama</div></div>
+      <div class="chart-stat"><div class="sv" id="statDiff">0</div><div class="sl">Tidak Mirip</div></div>
+    </div>
+  </div>
 
-    <div class="row g-4">
-        <div class="col-lg-5">
-            <div class="info-strip h-100">
-                <h6><span class="icon-circle"><i class="fa-solid fa-lightbulb"></i></span>Konsep Aljabar Linear yang Digunakan</h6>
-                <div>
-                    <span class="concept-pill"><i class="fa-solid fa-circle-check"></i>Matriks (Representasi Pixel)</span>
-                    <span class="concept-pill"><i class="fa-solid fa-circle-check"></i>Vektor (Flatten / Embedding)</span>
-                    <span class="concept-pill"><i class="fa-solid fa-circle-check"></i>Dot Product</span>
-                    <span class="concept-pill"><i class="fa-solid fa-circle-check"></i>Norma Vektor</span>
-                    <span class="concept-pill"><i class="fa-solid fa-circle-check"></i>Cosine Similarity</span>
-                    <span class="concept-pill"><i class="fa-solid fa-circle-check"></i>PCA / Eigenfaces</span>
-                    <span class="concept-pill"><i class="fa-solid fa-circle-check"></i>SVD (Xc = UΣVᵀ)</span>
-                    <span class="concept-pill"><i class="fa-solid fa-circle-check"></i>Reduksi Dimensi</span>
-                    <span class="concept-pill"><i class="fa-solid fa-circle-check"></i>Euclidean Distance</span>
-                </div>
-            </div>
+  <!-- INFO -->
+  <div class="row g-4">
+    <div class="col-lg-5">
+      <div class="info-card h-100">
+        <h6><span class="info-icon"><i class="fa-solid fa-lightbulb"></i></span>Konsep Aljabar Linear</h6>
+        <div>
+          <span class="concept-pill"><i class="fa-solid fa-circle-check"></i>Matriks (Pixel)</span>
+          <span class="concept-pill"><i class="fa-solid fa-circle-check"></i>Vektor (Embedding)</span>
+          <span class="concept-pill"><i class="fa-solid fa-circle-check"></i>Dot Product</span>
+          <span class="concept-pill"><i class="fa-solid fa-circle-check"></i>Norma Vektor</span>
+          <span class="concept-pill"><i class="fa-solid fa-circle-check"></i>Cosine Similarity</span>
+          <span class="concept-pill"><i class="fa-solid fa-circle-check"></i>PCA / Eigenfaces</span>
+          <span class="concept-pill"><i class="fa-solid fa-circle-check"></i>SVD (Xc=UΣVᵀ)</span>
+          <span class="concept-pill"><i class="fa-solid fa-circle-check"></i>Reduksi Dimensi</span>
+          <span class="concept-pill"><i class="fa-solid fa-circle-check"></i>Euclidean Distance</span>
         </div>
-        <div class="col-lg-7">
-            <div class="info-strip h-100">
-                <h6><span class="icon-circle"><i class="fa-solid fa-circle-exclamation"></i></span>Catatan Penggunaan</h6>
-                <div style="font-size:0.87rem;color:var(--fm-dark);line-height:1.7;">
-                    <div style="background:var(--fm-green-bg);border:1px solid #c7ecdb;border-radius:10px;padding:0.65rem 0.85rem;margin-bottom:0.7rem;">
-                        <div style="font-weight:700;color:var(--fm-green);font-size:0.82rem;margin-bottom:0.25rem;"><i class="fa-solid fa-layer-group me-1"></i>PCA / Eigenfaces</div>
-                        <div style="color:#444;font-size:0.82rem;">Metode Aljabar Linear klasik berbasis reduksi dimensi (SVD). Tujuannya untuk mendeteksi kemiripan wajah melalui proyeksi ke ruang eigenfaces.<br><br>
-                        <span style="color:#c0392b;font-weight:600;">⚠ Keterbatasan:</span> PCA sensitif terhadap perubahan pencahayaan, posisi, dan ekspresi wajah.</div>
-                    </div>
-                    <div style="background:#f7f7fa;border:1px solid #ececf3;border-radius:10px;padding:0.65rem 0.85rem;">
-                        <div style="font-weight:700;color:#8c8fa3;font-size:0.82rem;margin-bottom:0.25rem;"><i class="fa-solid fa-sliders me-1"></i>Pengaturan Threshold</div>
-                        <div style="color:#444;font-size:0.82rem;">Threshold default: <strong>0.60</strong>. Nilai lebih tinggi = lebih ketat. Nilai lebih rendah = lebih longgar. Atur melalui slider di panel upload.</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
+    <div class="col-lg-7">
+      <div class="info-card h-100">
+        <h6><span class="info-icon"><i class="fa-solid fa-circle-exclamation"></i></span>Catatan Penggunaan</h6>
+        <div class="info-note pca-note">
+          <div class="note-title pca"><i class="fa-solid fa-layer-group me-1"></i>PCA / Eigenfaces</div>
+          <div style="color:#333;font-size:0.82rem;">Metode Aljabar Linear klasik berbasis reduksi dimensi (SVD). Mendeteksi kemiripan melalui proyeksi ke ruang eigenfaces.
+          <br><span style="color:#c0392b;font-weight:600;">⚠ Sensitif</span> terhadap perubahan pencahayaan, posisi, dan ekspresi.</div>
+        </div>
+        <div class="info-note" style="background:#f8f9fc;border:1px solid var(--fm-border);">
+          <div class="note-title" style="color:#6b7280;"><i class="fa-solid fa-sliders me-1"></i>Threshold PCA</div>
+          <div style="color:#333;font-size:0.82rem;">Default: <strong>0.60</strong>. Nilai lebih tinggi = lebih ketat. Atur lewat slider di panel upload.</div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bundle.min.js"></script>
@@ -602,66 +637,63 @@ let trendChartInstance=null;
 function dapatkanRiwayat(){{const d=localStorage.getItem('facematch_history');return d?JSON.parse(d):[];}}
 function simpanRiwayat(d){{localStorage.setItem('facematch_history',JSON.stringify(d));}}
 function renderRiwayat(){{
-    const r=dapatkanRiwayat(),tb=document.getElementById('historyTableBody'),
+  const r=dapatkanRiwayat(),tb=document.getElementById('historyTableBody'),
     hc=document.getElementById('historyCount'),bc=document.getElementById('btnClearHistory'),
     cc=document.getElementById('chartContainer');
-    hc.textContent=r.length+' Data Tersimpan';
-    if(r.length===0){{tb.innerHTML='<tr><td colspan="7" class="text-center py-4 text-muted"><i class="fa-solid fa-inbox d-block mb-2 fs-3 text-black-50"></i>Belum ada riwayat.</td></tr>';bc.style.display='none';cc.style.display='none';return;}}
-    bc.style.display='inline-block';cc.style.display='block';
-    tb.innerHTML=r.map(i=>`<tr><td><span class="text-secondary fw-semibold">#${{i.id}}</span></td>
-    <td><small class="text-muted">${{i.foto_kecil}}</small></td><td><small class="text-muted">${{i.foto_dewasa}}</small></td>
-    <td><span class="fw-bold" style="color:var(--fm-pink)">${{i.persentase}}%</span></td>
-    <td><span class="method-badge ${{i.metode==='pca'?'pca':'arcface'}}">${{i.metode==='pca'?'PCA':'ArcFace'}}</span></td>
+  hc.textContent=r.length+' Data Tersimpan';
+  if(r.length===0){{
+    tb.innerHTML='<tr><td colspan="7" class="text-center py-4" style="color:#c8cad8;"><i class="fa-solid fa-inbox d-block mb-2 fs-3"></i>Belum ada riwayat.</td></tr>';
+    bc.style.display='none';cc.style.display='none';bottomResize();return;
+  }}
+  bc.style.display='flex';cc.style.display='block';
+  tb.innerHTML=r.map(i=>`<tr>
+    <td><span style="color:#8c8fa3;font-weight:700;">#${{i.id}}</span></td>
+    <td><small style="color:#8c8fa3;">${{i.foto_kecil}}</small></td>
+    <td><small style="color:#8c8fa3;">${{i.foto_dewasa}}</small></td>
+    <td><span style="font-weight:800;font-family:'Poppins',sans-serif;color:#ec4f7f;">${{i.persentase}}%</span></td>
+    <td><span class="badge-metode ${{i.metode==='pca'?'pca':'arcface'}}">${{i.metode==='pca'?'PCA':'ArcFace'}}</span></td>
     <td><span class="badge-status ${{i.status==='Sama'?'same':'diff'}}">${{i.status}}</span></td>
-    <td><small class="text-black-50">${{i.tanggal}}</small></td></tr>`).join('');
-    const dk=[...r].reverse(),lbl=dk.map(i=>'#'+i.id),val=dk.map(i=>parseFloat(i.persentase));
-    const tc=document.getElementById('trendChart');
-    if(tc){{if(trendChartInstance)trendChartInstance.destroy();
+    <td><small style="color:#c8cad8;">${{i.tanggal}}</small></td>
+  </tr>`).join('');
+  const dk=[...r].reverse(),lbl=dk.map(i=>'#'+i.id),val=dk.map(i=>parseFloat(i.persentase));
+  const tc=document.getElementById('trendChart');
+  if(tc){{
+    if(trendChartInstance)trendChartInstance.destroy();
     trendChartInstance=new Chart(tc,{{type:'line',data:{{labels:lbl,datasets:[{{label:'Similarity (%)',data:val,
-    borderColor:'#ec4f7f',backgroundColor:'rgba(236,79,127,0.1)',borderWidth:2.5,
-    pointBackgroundColor:'#ec4f7f',pointRadius:4,tension:0.35,fill:true}}]}},
-    options:{{responsive:true,maintainAspectRatio:false,plugins:{{legend:{{display:false}}}},
-    scales:{{y:{{beginAtZero:true,max:100,ticks:{{callback:function(v){{return v+'%'}}}},
-    grid:{{color:'#ececf3'}}}},x:{{grid:{{display:false}}}}}}}}}});}}
-    const tot=r.length,avg=(val.reduce((a,b)=>a+b,0)/tot).toFixed(2),mx=Math.max(...val).toFixed(2),
-    sm=r.filter(i=>i.status==='Sama').length,df=tot-sm;
-    document.getElementById('statAvg').textContent=avg+'%';
-    document.getElementById('statMax').textContent=mx+'%';
-    document.getElementById('statSame').textContent=sm;
-    document.getElementById('statDiff').textContent=df;
+      borderColor:'#ec4f7f',backgroundColor:'rgba(236,79,127,0.08)',borderWidth:2.5,
+      pointBackgroundColor:'#ec4f7f',pointRadius:4,tension:0.35,fill:true}}]}},
+      options:{{responsive:true,maintainAspectRatio:false,plugins:{{legend:{{display:false}}}},
+      scales:{{y:{{beginAtZero:true,max:100,ticks:{{callback:v=>v+'%'}},grid:{{color:'#e8eaf0'}}}},x:{{grid:{{display:false}}}}}}}}}});
+  }}
+  const tot=r.length,avg=(val.reduce((a,b)=>a+b,0)/tot).toFixed(2),mx=Math.max(...val).toFixed(2),sm=r.filter(i=>i.status==='Sama').length;
+  document.getElementById('statAvg').textContent=avg+'%';
+  document.getElementById('statMax').textContent=mx+'%';
+  document.getElementById('statSame').textContent=sm;
+  document.getElementById('statDiff').textContent=tot-sm;
+  setTimeout(bottomResize,200);
+}}
+function clearHistory(){{
+  if(confirm('Hapus seluruh riwayat?')){{localStorage.removeItem('facematch_history');renderRiwayat();}}
 }}
 const _hasil={_hasil_json2};
-const _fk="{_nama_kecil}";
-const _fd="{_nama_dewasa}";
+const _fk="{_nama_kecil}";const _fd="{_nama_dewasa}";
 if(_hasil.status==='ok'&&_fk&&_fd){{
-    const r=dapatkanRiwayat();
-    const pct=parseFloat(_hasil.persentase);
-    const kes=_hasil.kesimpulan;
-    const mt=_hasil.metode;
-    const st2=(kes.includes('besar')||kes.includes('sedang'))?'Sama':'Tidak Mirip';
-    const nid=r.length>0?Math.max(...r.map(o=>o.id))+1:1;
-    const now=new Date();
-    const wkt=now.toLocaleDateString('id-ID',{{day:'numeric',month:'short'}})+' '+now.toLocaleTimeString('id-ID',{{hour:'2-digit',minute:'2-digit'}});
-    const nb={{id:nid,foto_kecil:_fk,foto_dewasa:_fd,persentase:pct.toFixed(2),metode:mt,status:st2,tanggal:wkt}};
-    const ada=r.some(i=>i.foto_kecil===nb.foto_kecil&&i.foto_dewasa===nb.foto_dewasa&&i.persentase===nb.persentase&&i.metode===nb.metode);
-    if(!ada){{r.unshift(nb);simpanRiwayat(r);}}
+  const r=dapatkanRiwayat();
+  const pct=parseFloat(_hasil.persentase),kes=_hasil.kesimpulan,mt=_hasil.metode;
+  const st2=(kes.includes('besar')||kes.includes('sedang'))?'Sama':'Tidak Mirip';
+  const nid=r.length>0?Math.max(...r.map(o=>o.id))+1:1;
+  const now=new Date();
+  const wkt=now.toLocaleDateString('id-ID',{{day:'numeric',month:'short'}})+' '+now.toLocaleTimeString('id-ID',{{hour:'2-digit',minute:'2-digit'}});
+  const nb={{id:nid,foto_kecil:_fk,foto_dewasa:_fd,persentase:pct.toFixed(2),metode:mt,status:st2,tanggal:wkt}};
+  const ada=r.some(i=>i.foto_kecil===nb.foto_kecil&&i.foto_dewasa===nb.foto_dewasa&&i.persentase===nb.persentase&&i.metode===nb.metode);
+  if(!ada){{r.unshift(nb);simpanRiwayat(r);}}
 }}
-document.addEventListener('DOMContentLoaded',function(){{
-    renderRiwayat();
-    document.getElementById('btnClearHistory').addEventListener('click',function(){{
-        if(confirm('Hapus seluruh riwayat?')){{localStorage.removeItem('facematch_history');renderRiwayat();}}
-    }});
-}});
-
-// Auto-resize
 function bottomResize(){{
-    window.parent.postMessage({{type:'streamlit:setFrameHeight',height:document.body.scrollHeight+32}},'*');
+  window.parent.postMessage({{type:'streamlit:setFrameHeight',height:document.body.scrollHeight+40}},'*');
 }}
-document.addEventListener('DOMContentLoaded', bottomResize);
-window.addEventListener('load', bottomResize);
-setTimeout(bottomResize, 200);
-setTimeout(bottomResize, 800);
-new ResizeObserver(bottomResize).observe(document.body);
+document.addEventListener('DOMContentLoaded',()=>{{renderRiwayat();setTimeout(bottomResize,300);setTimeout(bottomResize,900);}});
+window.addEventListener('load',bottomResize);
+new ResizeObserver(()=>setTimeout(bottomResize,100)).observe(document.body);
 </script>
 </body></html>"""
 
