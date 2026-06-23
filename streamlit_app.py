@@ -497,7 +497,7 @@ with col_right:
 <!DOCTYPE html><html lang="id"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 {CSS}
-<style>body{{background:transparent !important;}} .main-card{{border:none !important;}}</style>
+<style>body{{background:transparent !important;overflow-x:hidden !important;}} .main-card{{border:none !important;}}</style>
 </head><body style="background:transparent;padding:0;margin:0;overflow-x:hidden;">
 <div id="fm-resize-root">
     {hasil_html}
@@ -522,7 +522,7 @@ fmReportHeight();
 window.addEventListener('resize', fmReportHeight);
 </script>
 </body></html>"""
-        components.html(PAGE_HTML, height=620, scrolling=False)
+        components.html(PAGE_HTML, height=780, scrolling=True)
 
 # ── Section bawah: Riwayat & Info ─────────────────────────────
 _hasil_json2 = json.dumps({
@@ -684,4 +684,4 @@ document.addEventListener('DOMContentLoaded',function(){{
 </script>
 </body></html>"""
 
-components.html(BOTTOM_HTML, height=900, scrolling=True)
+components.html(BOTTOM_HTML, height=950, scrolling=True)
