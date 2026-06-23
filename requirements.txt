@@ -1,6 +1,7 @@
 streamlit
-deepface==0.0.93
-tensorflow==2.15.0
+deepface==0.0.79
+tensorflow==2.12.0
+keras==2.12.0
 opencv-python-headless
 scikit-learn
 numpy<2.0
