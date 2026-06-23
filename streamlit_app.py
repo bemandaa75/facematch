@@ -509,20 +509,27 @@ function anim(now){{const el=now-st0,pr=Math.min(el/dur,1),ea=1-Math.pow(1-pr,3)
 pc.textContent=cv.toFixed(2)+'%';gf.style.strokeDashoffset=ci-(ci*(cv/100));
 if(pr<1)requestAnimationFrame(anim);else{{pc.textContent=tg.toFixed(2)+'%';gf.style.strokeDashoffset=ci-(ci*(tg/100));}}}}
 requestAnimationFrame(anim);}}
-function togglePembuktian(btn){{const box=document.getElementById('boxPembuktian'),ic=btn.querySelector('.fa-chevron-down');
-if(!box)return;const bk=box.style.display==='none';box.style.display=bk?'block':'none';
-ic.style.transform=bk?'rotate(180deg)':'rotate(0deg)';
-sendHeight();}}
-function sendHeight(){{
-    const h=document.getElementById('fm-resize-root').scrollHeight+32;
-    window.parent.postMessage({{type:'streamlit:setFrameHeight',height:h}},'*');
+function togglePembuktian(btn){{
+    const box=document.getElementById('boxPembuktian'),ic=btn.querySelector('.fa-chevron-down');
+    if(!box)return;const bk=box.style.display==='none';
+    box.style.display=bk?'block':'none';
+    ic.style.transform=bk?'rotate(180deg)':'rotate(0deg)';
+    setTimeout(sendHeight,50);
 }}
+function sendHeight(){{
+    const root=document.getElementById('fm-resize-root');
+    if(!root)return;
+    const h=root.getBoundingClientRect().height+24;
+    window.parent.postMessage({{isStreamlitMessage:true,type:'streamlit:setFrameHeight',height:h}},'*');
+}}
+sendHeight();
 window.addEventListener('load',sendHeight);
-window.addEventListener('resize',sendHeight);
-setTimeout(sendHeight,300);
+setTimeout(sendHeight,100);
+setTimeout(sendHeight,500);
 </script>
 </body></html>"""
-        components.html(PAGE_HTML, height=820, scrolling=False)
+        _init_height = 760 if (hasil and hasil.get("status") == "ok") else 220
+        components.html(PAGE_HTML, height=_init_height, scrolling=False)
 
 # ── Section bawah: Riwayat & Info ─────────────────────────────
 _hasil_json2 = json.dumps({
