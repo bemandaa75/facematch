@@ -497,7 +497,7 @@ with col_right:
 <!DOCTYPE html><html lang="id"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 {CSS}
-<style>body{{background:transparent !important;}} .main-card{{border:none !important;}}</style>
+<style>body{{background:transparent !important;overflow-x:hidden !important;}} .main-card{{border:none !important;}}</style>
 </head><body style="background:transparent;padding:0;margin:0;">
 <div id="fm-resize-root">
     {hasil_html}
@@ -509,27 +509,20 @@ function anim(now){{const el=now-st0,pr=Math.min(el/dur,1),ea=1-Math.pow(1-pr,3)
 pc.textContent=cv.toFixed(2)+'%';gf.style.strokeDashoffset=ci-(ci*(cv/100));
 if(pr<1)requestAnimationFrame(anim);else{{pc.textContent=tg.toFixed(2)+'%';gf.style.strokeDashoffset=ci-(ci*(tg/100));}}}}
 requestAnimationFrame(anim);}}
-function togglePembuktian(btn){{
-    const box=document.getElementById('boxPembuktian'),ic=btn.querySelector('.fa-chevron-down');
-    if(!box)return;const bk=box.style.display==='none';
-    box.style.display=bk?'block':'none';
-    ic.style.transform=bk?'rotate(180deg)':'rotate(0deg)';
-    setTimeout(sendHeight,50);
+function togglePembuktian(btn){{const box=document.getElementById('boxPembuktian'),ic=btn.querySelector('.fa-chevron-down');
+if(!box)return;const bk=box.style.display==='none';box.style.display=bk?'block':'none';
+ic.style.transform=bk?'rotate(180deg)':'rotate(0deg)';
+parent.postMessage({{type:'fm-resize'}}, '*');}}
+function fmReportHeight(){{
+    const h=document.getElementById('fm-resize-root').scrollHeight + 16;
+    if(window.Streamlit){{ /* no-op, fallback below handles it */ }}
+    document.body.dataset.fmHeight=h;
 }}
-function sendHeight(){{
-    const root=document.getElementById('fm-resize-root');
-    if(!root)return;
-    const h=root.getBoundingClientRect().height+24;
-    window.parent.postMessage({{isStreamlitMessage:true,type:'streamlit:setFrameHeight',height:h}},'*');
-}}
-sendHeight();
-window.addEventListener('load',sendHeight);
-setTimeout(sendHeight,100);
-setTimeout(sendHeight,500);
+fmReportHeight();
+window.addEventListener('resize', fmReportHeight);
 </script>
 </body></html>"""
-        _init_height = 760 if (hasil and hasil.get("status") == "ok") else 220
-        components.html(PAGE_HTML, height=_init_height, scrolling=False)
+        components.html(PAGE_HTML, height=780, scrolling=True)
 
 # ── Section bawah: Riwayat & Info ─────────────────────────────
 _hasil_json2 = json.dumps({
