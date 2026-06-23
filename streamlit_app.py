@@ -522,7 +522,8 @@ fmReportHeight();
 window.addEventListener('resize', fmReportHeight);
 </script>
 </body></html>"""
-        components.html(PAGE_HTML, height=780, scrolling=True)
+        _ph = 760 if (hasil and hasil.get("status") == "ok") else 320
+        components.html(PAGE_HTML, height=_ph, scrolling=True)
 
 # ── Section bawah: Riwayat & Info ─────────────────────────────
 _hasil_json2 = json.dumps({
