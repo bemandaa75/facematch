@@ -515,7 +515,8 @@ if(pc&&gf){{
 function fmReportHeight(){{
   const root=document.getElementById('fm-resize-root');
   if(!root)return;
-  const h=root.getBoundingClientRect().height+40;
+  // Use max of getBoundingClientRect and scrollHeight for reliability
+  const h=Math.max(root.getBoundingClientRect().height, root.scrollHeight)+48;
   window.parent.postMessage({{type:'streamlit:setFrameHeight',height:Math.ceil(h)}},'*');
 }}
 function togglePembuktian(btn){{
@@ -525,8 +526,8 @@ function togglePembuktian(btn){{
   const opening=box.style.display==='none';
   box.style.display=opening?'block':'none';
   if(ic)ic.style.transform=opening?'rotate(180deg)':'rotate(0deg)';
-  setTimeout(fmReportHeight,50);
-  setTimeout(fmReportHeight,350);
+  // Force multiple resize calls to ensure Streamlit catches it
+  [50,150,300,600,1000].forEach(t=>setTimeout(fmReportHeight,t));
 }}
 document.addEventListener('DOMContentLoaded',()=>{{setTimeout(fmReportHeight,120);setTimeout(fmReportHeight,600);}});
 window.addEventListener('load',fmReportHeight);
@@ -535,8 +536,8 @@ _obs.observe(document.getElementById('fm-resize-root')||document.body);
 </script>
 </body></html>"""
         _hasil_ada = hasil and hasil.get("status") == "ok"
-        _h = 680 if _hasil_ada else 260
-        components.html(PAGE_HTML, height=_h, scrolling=False)
+        _h = 750 if _hasil_ada else 260
+        components.html(PAGE_HTML, height=_h, scrolling=True)
 
 # ── Section bawah: Riwayat & Info ─────────────────────────────
 _hasil_json2 = json.dumps({
@@ -697,4 +698,4 @@ new ResizeObserver(()=>setTimeout(bottomResize,100)).observe(document.body);
 </script>
 </body></html>"""
 
-components.html(BOTTOM_HTML, height=1100, scrolling=False)
+components.html(BOTTOM_HTML, height=1100, scrolling=True)
