@@ -485,7 +485,7 @@ fmReportHeight();
 window.addEventListener('resize', fmReportHeight);
 </script>
 </body></html>"""
-        components.html(PAGE_HTML, height=620, scrolling=False)
+        components.html(PAGE_HTML, height=980, scrolling=False)
 
 # ── Section bawah: Riwayat & Info ─────────────────────────────
 _hasil_json2 = json.dumps({
