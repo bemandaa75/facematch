@@ -22,6 +22,11 @@ st.html("""
 }
 html, body, [class*="css"]{ font-family:'Inter','Segoe UI',sans-serif; }
 
+/* Force light mode regardless of OS/browser dark mode */
+html, body { background-color:#f7f7fa !important; color:#2b2d3a !important; color-scheme: light !important; }
+[data-testid="stAppViewContainer"], [data-testid="stApp"], .main, section.main { background-color:#f7f7fa !important; }
+* { color-scheme: light !important; }
+
 #MainMenu,footer,header{visibility:hidden}
 [data-testid="stSidebar"]{display:none}
 [data-testid="collapsedControl"]{display:none}
@@ -185,7 +190,7 @@ CSS = """
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
 :root{--fm-pink:#ec4f7f;--fm-pink-light:#fde7ee;--fm-bg:#f7f7fa;--fm-dark:#2b2d3a;--fm-muted:#8c8fa3;--fm-border:#ececf3;--fm-green:#2bb673;--fm-green-bg:#e8f8f0;--fm-amber:#e0a13a;--fm-amber-bg:#fdf2e2;}
-body{background-color:var(--fm-bg);font-family:'Inter','Segoe UI',sans-serif;color:var(--fm-dark);margin:0;}
+html,body{background-color:var(--fm-bg) !important;font-family:'Inter','Segoe UI',sans-serif;color:var(--fm-dark) !important;margin:0;color-scheme:light !important;}
 h1,h2,h3,h4,h5,h6{font-family:'Poppins',sans-serif;}
 .header-section{text-align:center;margin-bottom:2rem;}
 .header-logo{display:inline-flex;align-items:center;justify-content:center;gap:0.85rem;}
@@ -459,6 +464,7 @@ with col_right:
         PAGE_HTML = f"""
 <!DOCTYPE html><html lang="id"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="color-scheme" content="light">
 {CSS}
 <style>body{{background:transparent !important;}} .main-card{{border:none !important;}}</style>
 </head><body style="background:transparent;padding:0;margin:0;">
@@ -477,15 +483,21 @@ if(!box)return;const bk=box.style.display==='none';box.style.display=bk?'block':
 ic.style.transform=bk?'rotate(180deg)':'rotate(0deg)';
 parent.postMessage({{type:'fm-resize'}}, '*');}}
 function fmReportHeight(){{
-    const h=document.getElementById('fm-resize-root').scrollHeight + 16;
-    if(window.Streamlit){{ /* no-op, fallback below handles it */ }}
-    document.body.dataset.fmHeight=h;
+    const root=document.getElementById('fm-resize-root');
+    if(!root) return;
+    const h=root.scrollHeight + 32;
+    window.parent.postMessage({{type:'streamlit:setFrameHeight',height:h}},'*');
 }}
-fmReportHeight();
-window.addEventListener('resize', fmReportHeight);
+document.addEventListener('DOMContentLoaded', fmReportHeight);
+window.addEventListener('load', fmReportHeight);
+setTimeout(fmReportHeight, 100);
+setTimeout(fmReportHeight, 600);
+new ResizeObserver(fmReportHeight).observe(document.body);
 </script>
 </body></html>"""
-        components.html(PAGE_HTML, height=980, scrolling=False)
+        _hasil_ada = hasil and hasil.get("status") == "ok"
+        _h = 680 if _hasil_ada else 260
+        components.html(PAGE_HTML, height=_h, scrolling=False)
 
 # ── Section bawah: Riwayat & Info ─────────────────────────────
 _hasil_json2 = json.dumps({
@@ -497,6 +509,7 @@ _hasil_json2 = json.dumps({
 
 BOTTOM_HTML = f"""
 <!DOCTYPE html><html lang="id"><head><meta charset="UTF-8">
+<meta name="color-scheme" content="light">
 {CSS}
 </head><body style="background:transparent;padding:0;margin:0;">
 <div class="container-fluid px-0">
@@ -639,7 +652,17 @@ document.addEventListener('DOMContentLoaded',function(){{
         if(confirm('Hapus seluruh riwayat?')){{localStorage.removeItem('facematch_history');renderRiwayat();}}
     }});
 }});
+
+// Auto-resize
+function bottomResize(){{
+    window.parent.postMessage({{type:'streamlit:setFrameHeight',height:document.body.scrollHeight+32}},'*');
+}}
+document.addEventListener('DOMContentLoaded', bottomResize);
+window.addEventListener('load', bottomResize);
+setTimeout(bottomResize, 200);
+setTimeout(bottomResize, 800);
+new ResizeObserver(bottomResize).observe(document.body);
 </script>
 </body></html>"""
 
-components.html(BOTTOM_HTML, height=620, scrolling=False)
+components.html(BOTTOM_HTML, height=1100, scrolling=False)
