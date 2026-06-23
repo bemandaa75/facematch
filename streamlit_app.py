@@ -111,6 +111,13 @@ div[data-testid="stButton"] > button:hover{
 div[data-testid="stButton"] > button p{ color:#fff !important; font-weight:700 !important; }
 
 iframe{ border:none !important; }
+
+/* ── MOBILE ── */
+@media (max-width:768px){
+    .block-container{padding:0.75rem 0.75rem 2rem !important;}
+    [data-testid="column"]{width:100% !important;flex:0 0 100% !important;min-width:100% !important;}
+    div[data-testid="stHorizontalBlock"]{flex-direction:column !important;gap:0.75rem !important;}
+}
 </style>""")
 
 
@@ -497,20 +504,8 @@ with col_right:
 <!DOCTYPE html><html lang="id"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 {CSS}
-<style>body{{background:transparent !important;overflow-x:hidden !important;}}
-.main-card{{border:none !important;}}
-@media (max-width:600px){{
-  .row.g-3.align-items-center{{flex-direction:column !important;text-align:center;}}
-  .row.g-3.align-items-center > .col-4{{width:100% !important;max-width:100% !important;flex:0 0 100% !important;padding:0.25rem 0 !important;}}
-  .gauge-wrap{{width:140px !important;height:140px !important;}}
-  .preview-img{{max-height:150px !important;}}
-  .result-badge{{font-size:0.8rem !important;padding:0.45rem 0.85rem !important;text-align:center;}}
-  .vector-row{{font-size:0.82rem !important;}}
-  .meta-info-pill{{min-width:100% !important;}}
-  .meta-info-row{{flex-direction:column !important;}}
-}}
-</style>
-</head><body style="background:transparent;padding:0;margin:0;">
+<style>body{{background:transparent !important;}} .main-card{{border:none !important;}}</style>
+</head><body style="background:transparent;padding:0;margin:0;overflow-x:hidden;">
 <div id="fm-resize-root">
     {hasil_html}
 </div>
@@ -534,7 +529,8 @@ fmReportHeight();
 window.addEventListener('resize', fmReportHeight);
 </script>
 </body></html>"""
-        components.html(PAGE_HTML, height=620, scrolling=False)
+        _ph = 800 if (hasil and hasil.get("status") == "ok") else 280
+        components.html(PAGE_HTML, height=_ph, scrolling=True)
 
 # ── Section bawah: Riwayat & Info ─────────────────────────────
 _hasil_json2 = json.dumps({
@@ -547,7 +543,7 @@ _hasil_json2 = json.dumps({
 BOTTOM_HTML = f"""
 <!DOCTYPE html><html lang="id"><head><meta charset="UTF-8">
 {CSS}
-</head><body style="background:transparent;padding:0;margin:0;">
+</head><body style="background:transparent;padding:0;margin:0;overflow-x:hidden;">
 <div class="container-fluid px-0">
 
     <div class="row mb-4">
@@ -696,4 +692,4 @@ document.addEventListener('DOMContentLoaded',function(){{
 </script>
 </body></html>"""
 
-components.html(BOTTOM_HTML, height=620, scrolling=False)
+components.html(BOTTOM_HTML, height=1050, scrolling=True)
