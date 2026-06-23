@@ -111,6 +111,14 @@ div[data-testid="stButton"] > button:hover{
 div[data-testid="stButton"] > button p{ color:#fff !important; font-weight:700 !important; }
 
 iframe{ border:none !important; }
+
+/* ── MOBILE RESPONSIVE ── */
+@media (max-width: 768px) {
+    .block-container{padding:0.75rem !important;}
+    [data-testid="column"]{width:100% !important;flex:100% !important;min-width:100% !important;}
+    div[data-testid="stHorizontalBlock"]{flex-direction:column !important;gap:0.75rem !important;}
+}
+
 </style>""")
 
 
@@ -406,7 +414,7 @@ st.markdown(f"""
 <div style="text-align:center;padding:0.5rem 0 1.75rem;font-family:'Inter',sans-serif;">
     <div style="display:inline-flex;align-items:center;justify-content:center;gap:0.85rem;">
         {_logo_html}
-        <h1 style="font-family:'Poppins',sans-serif;font-weight:800;font-size:2.5rem;letter-spacing:-0.02em;margin:0;color:#2b2d3a;">FaceMatch</h1>
+        <h1 style="font-family:'Poppins',sans-serif;font-weight:800;font-size:clamp(1.6rem,5vw,2.5rem);letter-spacing:-0.02em;margin:0;color:#2b2d3a;">FaceMatch</h1>
     </div>
     <p style="color:#8c8fa3;font-size:1rem;margin-top:0.35rem;">Deteksi Kemiripan Wajah Masa Kecil dan Dewasa Berdasarkan Prinsip Aljabar Linear</p>
     <div style="width:90px;height:3px;border-radius:3px;background:linear-gradient(90deg,transparent,#ec4f7f,transparent);margin:1rem auto 0;"></div>
