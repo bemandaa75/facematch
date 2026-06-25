@@ -126,7 +126,7 @@ def load_pca_model():
             if not file.lower().endswith((".jpg",".jpeg",".png")): continue
             try:
                 r = DeepFace.represent(img_path=os.path.join(folder,file),
-                    model_name="Facenet512", enforce_detection=False, detector_backend="retinaface")
+                    model_name="Facenet512", enforce_detection=False, detector_backend="opencv")
                 if r:
                     X.append(np.array(r[0]["embedding"])); labels.append(nama)
             except: pass
@@ -145,7 +145,7 @@ def analisis_pca(path1, path2, threshold=0.60):
     try:
         def emb(p):
             r = DeepFace.represent(img_path=p,model_name="Facenet512",
-                enforce_detection=False,detector_backend="retinaface")
+                enforce_detection=False,detector_backend="opencv")
             return np.array(r[0]["embedding"])
         e1=emb(path1).reshape(1,-1); e2=emb(path2).reshape(1,-1)
         z1=pca.transform(sc.transform(e1-me)).flatten()
