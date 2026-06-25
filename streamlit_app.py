@@ -231,7 +231,7 @@ CSS = """
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
 :root{--fm-pink:#ec4f7f;--fm-pink-light:#fde7ee;--fm-bg:#f7f7fa;--fm-dark:#2b2d3a;--fm-muted:#8c8fa3;--fm-border:#ececf3;--fm-green:#2bb673;--fm-green-bg:#e8f8f0;--fm-amber:#e0a13a;--fm-amber-bg:#fdf2e2;}
-body{background-color:var(--fm-bg);font-family:'Inter','Segoe UI',sans-serif;color:var(--fm-dark);margin:0;}
+body{background-color:var(--fm-bg);font-family:'Inter','Segoe UI',sans-serif;color:var(--fm-dark);margin:0;overflow-x:hidden;}
 h1,h2,h3,h4,h5,h6{font-family:'Poppins',sans-serif;}
 .header-section{text-align:center;margin-bottom:2rem;}
 .header-logo{display:inline-flex;align-items:center;justify-content:center;gap:0.85rem;}
@@ -398,34 +398,34 @@ if hasil and hasil.get("status") == "ok":
             <div class="p-3 rounded-3" style="background:#f7f7fa;border:1px solid var(--fm-border);font-size:0.83rem;font-family:monospace;line-height:2;">
                 {pembuktian_html}
             </div>
+
+            <div class="mt-3 pt-3" style="border-top:1px solid var(--fm-border);">
+                <div class="card-title-row" style="margin-bottom:1rem;"><i class="fa-solid fa-image"></i>Grid Grayscale (Input PCA)</div>
+                <div class="row g-3">
+                    <div class="col-6 text-center">
+                        <img src="data:image/png;base64,{d.get('gray1','')}" style="width:100%;max-width:160px;border-radius:10px;border:1px solid var(--fm-border);" alt="Grayscale Kecil">
+                        <div class="preview-label">Foto Masa Kecil (grayscale 100×100)</div>
+                    </div>
+                    <div class="col-6 text-center">
+                        <img src="data:image/png;base64,{d.get('gray2','')}" style="width:100%;max-width:160px;border-radius:10px;border:1px solid var(--fm-border);" alt="Grayscale Dewasa">
+                        <div class="preview-label">Foto Masa Dewasa (grayscale 100×100)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-3 pt-3" style="border-top:1px solid var(--fm-border);">
+                <div class="card-title-row" style="margin-bottom:1rem;"><i class="fa-solid fa-chart-simple"></i>Komposisi Fitur PCA (per Foto)</div>
+                <div class="row g-3">
+                    <div class="col-md-6">{fitur_bar_block("Foto Masa Kecil", d.get('fitur1',{}))}</div>
+                    <div class="col-md-6">{fitur_bar_block("Foto Masa Dewasa", d.get('fitur2',{}))}</div>
+                </div>
+                <div style="font-size:0.78rem;color:var(--fm-muted);margin-top:0.6rem;">
+                    <i class="fa-solid fa-circle-info me-1"></i>PC1–PC3 menunjukkan kontribusi komponen utama hasil reduksi dimensi (SVD); Energi Total = Σz², Kemiringan = ukuran asimetri distribusi nilai vektor z.
+                </div>
+            </div>
         </div>
     </div>
     <div class="meta-info-row">{meta_html}</div>
-
-    <div class="mt-4 pt-3" style="border-top:1px solid var(--fm-border);">
-        <div class="card-title-row" style="margin-bottom:1rem;"><i class="fa-solid fa-image"></i>Grid Grayscale (Input PCA)</div>
-        <div class="row g-3">
-            <div class="col-6 text-center">
-                <img src="data:image/png;base64,{d.get('gray1','')}" style="width:100%;max-width:160px;border-radius:10px;border:1px solid var(--fm-border);" alt="Grayscale Kecil">
-                <div class="preview-label">Foto Masa Kecil (grayscale 100×100)</div>
-            </div>
-            <div class="col-6 text-center">
-                <img src="data:image/png;base64,{d.get('gray2','')}" style="width:100%;max-width:160px;border-radius:10px;border:1px solid var(--fm-border);" alt="Grayscale Dewasa">
-                <div class="preview-label">Foto Masa Dewasa (grayscale 100×100)</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="mt-4 pt-3" style="border-top:1px solid var(--fm-border);">
-        <div class="card-title-row" style="margin-bottom:1rem;"><i class="fa-solid fa-chart-simple"></i>Komposisi Fitur PCA (per Foto)</div>
-        <div class="row g-3">
-            <div class="col-md-6">{fitur_bar_block("Foto Masa Kecil", d.get('fitur1',{}))}</div>
-            <div class="col-md-6">{fitur_bar_block("Foto Masa Dewasa", d.get('fitur2',{}))}</div>
-        </div>
-        <div style="font-size:0.78rem;color:var(--fm-muted);margin-top:0.6rem;">
-            <i class="fa-solid fa-circle-info me-1"></i>PC1–PC3 menunjukkan kontribusi komponen utama hasil reduksi dimensi (SVD); Energi Total = Σz², Kemiringan = ukuran asimetri distribusi nilai vektor z.
-        </div>
-    </div>
     """
 else:
     hasil_html = """
@@ -557,7 +557,7 @@ window.addEventListener('resize', fmReportHeight);
 </script>
 </body></html>"""
         _page_height = 1500 if (hasil and hasil.get("status") == "ok") else 380
-        components.html(PAGE_HTML, height=_page_height, scrolling=True)
+        components.html(PAGE_HTML, height=_page_height, scrolling=False)
 
 # ── Section bawah: Riwayat & Info ─────────────────────────────
 _hasil_json2 = json.dumps({
