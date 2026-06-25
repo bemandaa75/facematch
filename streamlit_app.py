@@ -548,7 +548,7 @@ if(!box)return;const bk=box.style.display==='none';box.style.display=bk?'block':
 ic.style.transform=bk?'rotate(180deg)':'rotate(0deg)';}}
 </script>
 </body></html>"""
-        _page_height = 720 if (hasil and hasil.get("status") == "ok") else 380
+        _page_height = 800 if (hasil and hasil.get("status") == "ok") else 380
         components.html(PAGE_HTML, height=_page_height, scrolling=True)
 
 # ── Section bawah: Riwayat & Info ─────────────────────────────
