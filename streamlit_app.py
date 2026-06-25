@@ -53,13 +53,20 @@ div[data-testid="stVerticalBlockBorderWrapper"] > div{
     border-radius:14px !important;
     background:#fafafa !important;
     padding:0.85rem !important;
+    transition: border-color 0.2s, background 0.2s !important;
 }
 [data-testid="stFileUploaderDropzone"]:hover{
     border-color:var(--fm-pink) !important;
     background:var(--fm-pink-light) !important;
 }
-[data-testid="stFileUploaderDropzoneInstructions"] span{ font-size:0.82rem !important; }
-[data-testid="stFileUploaderDropzoneInstructions"] svg{ width:1.4rem !important; height:1.4rem !important; }
+[data-testid="stFileUploaderDropzoneInstructions"] span{ font-size:0.82rem !important; color:var(--fm-muted) !important; }
+[data-testid="stFileUploaderDropzoneInstructions"] svg{ width:1.4rem !important; height:1.4rem !important; color:var(--fm-pink) !important; }
+/* Checkbox styling */
+[data-testid="stCheckbox"] label p{ font-size:0.84rem !important; font-weight:600 !important; color:var(--fm-dark) !important; }
+[data-testid="stCheckbox"] [data-testid="stCheckboxWidget"]{ accent-color:var(--fm-pink) !important; }
+/* Slider accent */
+[data-testid="stSlider"] [data-testid="stSlider"]{ accent-color:var(--fm-pink) !important; }
+[data-testid="stSlider"] .st-emotion-cache-1xr3c4h{ color:var(--fm-pink) !important; }
 
 div[data-testid="stRadio"] > div[role="radiogroup"]{
     display:flex; gap:0.6rem; flex-wrap:nowrap;
@@ -104,13 +111,20 @@ div[data-testid="stButton"] > button:hover{
 div[data-testid="stButton"] > button p{ color:#fff !important; font-weight:700 !important; }
 
 iframe{ border:none !important; }
+
+/* ── MOBILE ── */
+@media (max-width:768px){
+    .block-container{padding:0.75rem 0.75rem 2rem !important;}
+    [data-testid="column"]{width:100% !important;flex:0 0 100% !important;min-width:100% !important;}
+    div[data-testid="stHorizontalBlock"]{flex-direction:column !important;gap:0.75rem !important;}
+}
 </style>""")
 
 
 
 # ── Konfigurasi PCA ───────────────────────────────────────────
 DATASET_FOLDER = "dataset"
-N_COMPONENTS   = 150
+N_COMPONENTS   = 50
 THRESHOLD_PCA  = 0.60
 
 # ── Load model PCA (cached) ───────────────────────────────────
@@ -126,7 +140,7 @@ def load_pca_model():
             if not file.lower().endswith((".jpg",".jpeg",".png")): continue
             try:
                 r = DeepFace.represent(img_path=os.path.join(folder,file),
-                    model_name="Facenet512", enforce_detection=False, detector_backend="retinaface")
+                    model_name="Facenet512", enforce_detection=False, detector_backend="opencv")
                 if r:
                     X.append(np.array(r[0]["embedding"])); labels.append(nama)
             except: pass
@@ -145,7 +159,7 @@ def analisis_pca(path1, path2, threshold=0.60):
     try:
         def emb(p):
             r = DeepFace.represent(img_path=p,model_name="Facenet512",
-                enforce_detection=False,detector_backend="retinaface")
+                enforce_detection=False,detector_backend="opencv")
             return np.array(r[0]["embedding"])
         e1=emb(path1).reshape(1,-1); e2=emb(path2).reshape(1,-1)
         z1=pca.transform(sc.transform(e1-me)).flatten()
@@ -419,9 +433,39 @@ with col_left:
         st.markdown('<div class="fm-field-label">🧑 Foto Masa Dewasa</div>', unsafe_allow_html=True)
         foto_dewasa = st.file_uploader("foto_dewasa", type=["jpg","jpeg","png","jfif","webp"], label_visibility="collapsed", key="up_dewasa")
 
-        st.markdown('<div class="fm-field-label">⚙️ Threshold Kemiripan PCA</div>', unsafe_allow_html=True)
-        threshold = st.slider("threshold", min_value=0.30, max_value=0.90, value=0.60, step=0.05, label_visibility="collapsed")
-        st.caption(f"Default: 0.60 | Saat ini: {threshold:.2f} | Makin tinggi = makin ketat")
+        # ── Threshold PCA (opsional) ──────────────────────────────
+        st.markdown("""
+<div style="margin-top:.85rem;margin-bottom:.35rem;">
+  <div style="display:flex;align-items:center;justify-content:space-between;">
+    <span style="font-size:.88rem;font-weight:600;color:#2b2d3a;">&#9881;&#65039; Threshold PCA</span>
+    <span style="font-size:.74rem;color:#8c8fa3;background:#f7f7fa;border:1px solid #ececf3;
+          border-radius:20px;padding:.18rem .65rem;font-weight:500;">Opsional</span>
+  </div>
+  <div style="font-size:.75rem;color:#8c8fa3;margin-top:.2rem;line-height:1.5;">
+    Default <strong style="color:#2b2d3a;">0.60</strong> sudah dioptimalkan. Centang di bawah hanya jika ingin menyesuaikan.
+  </div>
+</div>
+""", unsafe_allow_html=True)
+        atur_threshold = st.checkbox("Atur threshold secara manual", value=False, key="cb_threshold")
+        if atur_threshold:
+            threshold = st.slider(
+                "threshold", min_value=0.30, max_value=0.90, value=0.60, step=0.05,
+                label_visibility="collapsed",
+                help="Makin tinggi = makin ketat (lebih sedikit yang dianggap mirip). Makin rendah = makin longgar."
+            )
+            level = "🔒 Ketat" if threshold > 0.60 else ("🔓 Longgar" if threshold < 0.60 else "⚖️ Default")
+            st.markdown(
+                f'<div style="font-size:.75rem;color:#ec4f7f;font-weight:600;margin-top:-.2rem;">'
+                f'Threshold aktif: <strong>{threshold:.2f}</strong> &nbsp;{level}</div>',
+                unsafe_allow_html=True
+            )
+        else:
+            threshold = 0.60
+            st.markdown(
+                '<div style="font-size:.75rem;color:#8c8fa3;margin-top:-.1rem;">'
+                'Menggunakan nilai otomatis: <strong style="color:#2b2d3a;">0.60</strong></div>',
+                unsafe_allow_html=True
+            )
 
         analisis_btn = st.button("🔍 Analisis Kemiripan", use_container_width=True)
 
@@ -461,7 +505,7 @@ with col_right:
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 {CSS}
 <style>body{{background:transparent !important;}} .main-card{{border:none !important;}}</style>
-</head><body style="background:transparent;padding:0;margin:0;">
+</head><body style="background:transparent;padding:0;margin:0;overflow-x:hidden;">
 <div id="fm-resize-root">
     {hasil_html}
 </div>
@@ -485,7 +529,8 @@ fmReportHeight();
 window.addEventListener('resize', fmReportHeight);
 </script>
 </body></html>"""
-        components.html(PAGE_HTML, height=980, scrolling=False)
+        _ph = 800 if (hasil and hasil.get("status") == "ok") else 280
+        components.html(PAGE_HTML, height=_ph, scrolling=True)
 
 # ── Section bawah: Riwayat & Info ─────────────────────────────
 _hasil_json2 = json.dumps({
@@ -498,7 +543,7 @@ _hasil_json2 = json.dumps({
 BOTTOM_HTML = f"""
 <!DOCTYPE html><html lang="id"><head><meta charset="UTF-8">
 {CSS}
-</head><body style="background:transparent;padding:0;margin:0;">
+</head><body style="background:transparent;padding:0;margin:0;overflow-x:hidden;">
 <div class="container-fluid px-0">
 
     <div class="row mb-4">
@@ -573,8 +618,13 @@ BOTTOM_HTML = f"""
                         <span style="color:#c0392b;font-weight:600;">⚠ Keterbatasan:</span> PCA sensitif terhadap perubahan pencahayaan, posisi, dan ekspresi wajah.</div>
                     </div>
                     <div style="background:#f7f7fa;border:1px solid #ececf3;border-radius:10px;padding:0.65rem 0.85rem;">
-                        <div style="font-weight:700;color:#8c8fa3;font-size:0.82rem;margin-bottom:0.25rem;"><i class="fa-solid fa-sliders me-1"></i>Pengaturan Threshold</div>
-                        <div style="color:#444;font-size:0.82rem;">Threshold default: <strong>0.60</strong>. Nilai lebih tinggi = lebih ketat. Nilai lebih rendah = lebih longgar. Atur melalui slider di panel upload.</div>
+                        <div style="font-weight:700;color:#8c8fa3;font-size:0.82rem;margin-bottom:0.25rem;"><i class="fa-solid fa-sliders me-1"></i>Pengaturan Threshold (Opsional)</div>
+                        <div style="color:#444;font-size:0.82rem;">
+                            Threshold default <strong>0.60</strong> sudah dioptimalkan untuk sebagian besar kasus — tidak perlu diubah.<br>
+                            Centang <em>"Atur threshold secara manual"</em> di panel kiri jika ingin menyesuaikan:<br>
+                            <span style="color:#2bb673;">↑ Lebih tinggi</span> = lebih ketat (kurangi false positive) &nbsp;|&nbsp;
+                            <span style="color:#ec4f7f;">↓ Lebih rendah</span> = lebih longgar (tangkap lebih banyak kemiripan)
+                        </div>
                     </div>
                 </div>
             </div>
@@ -642,4 +692,4 @@ document.addEventListener('DOMContentLoaded',function(){{
 </script>
 </body></html>"""
 
-components.html(BOTTOM_HTML, height=620, scrolling=False)
+components.html(BOTTOM_HTML, height=1050, scrolling=True)
