@@ -53,13 +53,20 @@ div[data-testid="stVerticalBlockBorderWrapper"] > div{
     border-radius:14px !important;
     background:#fafafa !important;
     padding:0.85rem !important;
+    transition: border-color 0.2s, background 0.2s !important;
 }
 [data-testid="stFileUploaderDropzone"]:hover{
     border-color:var(--fm-pink) !important;
     background:var(--fm-pink-light) !important;
 }
-[data-testid="stFileUploaderDropzoneInstructions"] span{ font-size:0.82rem !important; }
-[data-testid="stFileUploaderDropzoneInstructions"] svg{ width:1.4rem !important; height:1.4rem !important; }
+[data-testid="stFileUploaderDropzoneInstructions"] span{ font-size:0.82rem !important; color:var(--fm-muted) !important; }
+[data-testid="stFileUploaderDropzoneInstructions"] svg{ width:1.4rem !important; height:1.4rem !important; color:var(--fm-pink) !important; }
+/* Checkbox styling */
+[data-testid="stCheckbox"] label p{ font-size:0.84rem !important; font-weight:600 !important; color:var(--fm-dark) !important; }
+[data-testid="stCheckbox"] [data-testid="stCheckboxWidget"]{ accent-color:var(--fm-pink) !important; }
+/* Slider accent */
+[data-testid="stSlider"] [data-testid="stSlider"]{ accent-color:var(--fm-pink) !important; }
+[data-testid="stSlider"] .st-emotion-cache-1xr3c4h{ color:var(--fm-pink) !important; }
 
 div[data-testid="stRadio"] > div[role="radiogroup"]{
     display:flex; gap:0.6rem; flex-wrap:nowrap;
@@ -104,13 +111,20 @@ div[data-testid="stButton"] > button:hover{
 div[data-testid="stButton"] > button p{ color:#fff !important; font-weight:700 !important; }
 
 iframe{ border:none !important; }
+
+/* ── MOBILE ── */
+@media (max-width:768px){
+    .block-container{padding:0.75rem 0.75rem 2rem !important;}
+    [data-testid="column"]{width:100% !important;flex:0 0 100% !important;min-width:100% !important;}
+    div[data-testid="stHorizontalBlock"]{flex-direction:column !important;gap:0.75rem !important;}
+}
 </style>""")
 
 
 
 # ── Konfigurasi PCA ───────────────────────────────────────────
 DATASET_FOLDER = "dataset"
-N_COMPONENTS   = 150
+N_COMPONENTS   = 50
 THRESHOLD_PCA  = 0.60
 
 # ── Load model PCA (cached) ───────────────────────────────────
@@ -126,7 +140,7 @@ def load_pca_model():
             if not file.lower().endswith((".jpg",".jpeg",".png")): continue
             try:
                 r = DeepFace.represent(img_path=os.path.join(folder,file),
-                    model_name="Facenet512", enforce_detection=False, detector_backend="retinaface")
+                    model_name="Facenet512", enforce_detection=False, detector_backend="opencv")
                 if r:
                     X.append(np.array(r[0]["embedding"])); labels.append(nama)
             except: pass
@@ -145,7 +159,7 @@ def analisis_pca(path1, path2, threshold=0.60):
     try:
         def emb(p):
             r = DeepFace.represent(img_path=p,model_name="Facenet512",
-                enforce_detection=False,detector_backend="retinaface")
+                enforce_detection=False,detector_backend="opencv")
             return np.array(r[0]["embedding"])
         e1=emb(path1).reshape(1,-1); e2=emb(path2).reshape(1,-1)
         z1=pca.transform(sc.transform(e1-me)).flatten()
@@ -153,10 +167,6 @@ def analisis_pca(path1, path2, threshold=0.60):
         dot=float(np.dot(z1,z2)); n1=float(np.linalg.norm(z1)); n2=float(np.linalg.norm(z2))
         sim=dot/(n1*n2) if n1>0 and n2>0 else 0.0
         ed =float(np.linalg.norm(z1-z2))
-        gray1 = grayscale_grid_b64(path1)
-        gray2 = grayscale_grid_b64(path2)
-        fitur1 = fitur_pca_stats(z1)
-        fitur2 = fitur_pca_stats(z2)
         if sim>=threshold:
             pct=round(min((sim+0.20)*100,99.0),2); kes="Kemungkinan besar orang yang sama (Terverifikasi via PCA/Eigenfaces)"
         elif sim>=threshold-0.20:
@@ -165,58 +175,16 @@ def analisis_pca(path1, path2, threshold=0.60):
             pct=round(max(sim*100,0.0),2); kes="Kemungkinan bukan orang yang sama (PCA/Eigenfaces)"
         return {"status":"ok","dot_product":round(dot,4),"norma_a":round(n1,4),"norma_b":round(n2,4),
                 "cosine_similarity":round(sim,4),"euclidean_distance":round(ed,4),
-                "persentase":pct,"kesimpulan":kes,"n_components":pca.n_components_,"total_dataset":total,
-                "gray1":gray1,"gray2":gray2,"fitur1":fitur1,"fitur2":fitur2}
+                "persentase":pct,"kesimpulan":kes,"n_components":pca.n_components_,"total_dataset":total}
     except Exception as e: return {"status":"error","pesan":str(e)}
 
 
-
-def fitur_bar_block(judul, f):
-    """Render blok bar horizontal sederhana untuk komposisi fitur PCA satu foto."""
-    if not f: return ""
-    items = [("PC Dominan (PC1)", f.get("pc1",0)), ("Variasi PC2", f.get("pc2",0)),
-             ("Variasi PC3", f.get("pc3",0)), ("Energi Total (Σz²)", f.get("energi",0)),
-             ("Kemiringan", f.get("skew",0))]
-    maxval = max([abs(v) for _,v in items] + [1])
-    rows = ""
-    for label, val in items:
-        widthpct = min(100, abs(val) / maxval * 100)
-        rows += f"""
-        <div style="margin-bottom:0.55rem;">
-            <div style="display:flex;justify-content:space-between;font-size:0.78rem;color:var(--fm-muted);margin-bottom:0.2rem;">
-                <span>{label}</span><span style="font-weight:700;color:var(--fm-dark);">{val}</span>
-            </div>
-            <div style="background:var(--fm-bg);border-radius:6px;height:8px;overflow:hidden;">
-                <div style="background:var(--fm-pink);height:100%;width:{widthpct:.1f}%;border-radius:6px;"></div>
-            </div>
-        </div>"""
-    return f"""<div style="border:1px solid var(--fm-border);border-radius:12px;padding:0.9rem 1rem;height:100%;">
-    <div style="font-weight:700;font-size:0.85rem;color:var(--fm-dark);margin-bottom:0.7rem;">{judul}</div>
-    {rows}</div>"""
 
 def img_to_b64(path_or_bytes):
     if isinstance(path_or_bytes, str):
         with open(path_or_bytes,"rb") as f: data=f.read()
     else: data=path_or_bytes
     return base64.b64encode(data).decode()
-
-def grayscale_grid_b64(path, size=100):
-    """Konversi foto ke grayscale persegi (mirip ilustrasi matriks piksel input PCA)."""
-    img = Image.open(path).convert("L").resize((size, size))
-    buf = BytesIO(); img.save(buf, format="PNG")
-    return base64.b64encode(buf.getvalue()).decode()
-
-def fitur_pca_stats(z):
-    """Statistik ringkas dari vektor hasil proyeksi PCA (z), buat visualisasi 'komposisi fitur'."""
-    z = np.asarray(z, dtype=float)
-    energi = float(np.sum(z**2))
-    pc1 = float(abs(z[0])) if len(z) > 0 else 0.0
-    pc2 = float(abs(z[1])) if len(z) > 1 else 0.0
-    pc3 = float(abs(z[2])) if len(z) > 2 else 0.0
-    mean_z = float(np.mean(z)); std_z = float(np.std(z)) if np.std(z) > 0 else 1e-9
-    skew = float(np.mean(((z - mean_z) / std_z) ** 3))
-    return {"pc1": round(pc1,2), "pc2": round(pc2,2), "pc3": round(pc3,2),
-            "energi": round(energi,2), "skew": round(skew,2)}
 
 # ── State ─────────────────────────────────────────────────────
 for k,v in [("hasil",None),("metode",None),("img1_b64",None),("img2_b64",None),
@@ -401,31 +369,6 @@ if hasil and hasil.get("status") == "ok":
         </div>
     </div>
     <div class="meta-info-row">{meta_html}</div>
-
-    <div class="mt-4 pt-3" style="border-top:1px solid var(--fm-border);">
-        <div class="card-title-row" style="margin-bottom:1rem;"><i class="fa-solid fa-image"></i>Grid Grayscale (Input PCA)</div>
-        <div class="row g-3">
-            <div class="col-6 text-center">
-                <img src="data:image/png;base64,{d.get('gray1','')}" style="width:100%;max-width:160px;border-radius:10px;border:1px solid var(--fm-border);" alt="Grayscale Kecil">
-                <div class="preview-label">Foto Masa Kecil (grayscale 100×100)</div>
-            </div>
-            <div class="col-6 text-center">
-                <img src="data:image/png;base64,{d.get('gray2','')}" style="width:100%;max-width:160px;border-radius:10px;border:1px solid var(--fm-border);" alt="Grayscale Dewasa">
-                <div class="preview-label">Foto Masa Dewasa (grayscale 100×100)</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="mt-4 pt-3" style="border-top:1px solid var(--fm-border);">
-        <div class="card-title-row" style="margin-bottom:1rem;"><i class="fa-solid fa-chart-simple"></i>Komposisi Fitur PCA (per Foto)</div>
-        <div class="row g-3">
-            <div class="col-md-6">{fitur_bar_block("Foto Masa Kecil", d.get('fitur1',{}))}</div>
-            <div class="col-md-6">{fitur_bar_block("Foto Masa Dewasa", d.get('fitur2',{}))}</div>
-        </div>
-        <div style="font-size:0.78rem;color:var(--fm-muted);margin-top:0.6rem;">
-            <i class="fa-solid fa-circle-info me-1"></i>PC1–PC3 menunjukkan kontribusi komponen utama hasil reduksi dimensi (SVD); Energi Total = Σz², Kemiringan = ukuran asimetri distribusi nilai vektor z.
-        </div>
-    </div>
     """
 else:
     hasil_html = """
@@ -490,9 +433,39 @@ with col_left:
         st.markdown('<div class="fm-field-label">🧑 Foto Masa Dewasa</div>', unsafe_allow_html=True)
         foto_dewasa = st.file_uploader("foto_dewasa", type=["jpg","jpeg","png","jfif","webp"], label_visibility="collapsed", key="up_dewasa")
 
-        st.markdown('<div class="fm-field-label">⚙️ Threshold Kemiripan PCA</div>', unsafe_allow_html=True)
-        threshold = st.slider("threshold", min_value=0.30, max_value=0.90, value=0.60, step=0.05, label_visibility="collapsed")
-        st.caption(f"Default: 0.60 | Saat ini: {threshold:.2f} | Makin tinggi = makin ketat")
+        # ── Threshold PCA (opsional) ──────────────────────────────
+        st.markdown("""
+<div style="margin-top:.85rem;margin-bottom:.35rem;">
+  <div style="display:flex;align-items:center;justify-content:space-between;">
+    <span style="font-size:.88rem;font-weight:600;color:#2b2d3a;">&#9881;&#65039; Threshold PCA</span>
+    <span style="font-size:.74rem;color:#8c8fa3;background:#f7f7fa;border:1px solid #ececf3;
+          border-radius:20px;padding:.18rem .65rem;font-weight:500;">Opsional</span>
+  </div>
+  <div style="font-size:.75rem;color:#8c8fa3;margin-top:.2rem;line-height:1.5;">
+    Default <strong style="color:#2b2d3a;">0.60</strong> sudah dioptimalkan. Centang di bawah hanya jika ingin menyesuaikan.
+  </div>
+</div>
+""", unsafe_allow_html=True)
+        atur_threshold = st.checkbox("Atur threshold secara manual", value=False, key="cb_threshold")
+        if atur_threshold:
+            threshold = st.slider(
+                "threshold", min_value=0.30, max_value=0.90, value=0.60, step=0.05,
+                label_visibility="collapsed",
+                help="Makin tinggi = makin ketat (lebih sedikit yang dianggap mirip). Makin rendah = makin longgar."
+            )
+            level = "🔒 Ketat" if threshold > 0.60 else ("🔓 Longgar" if threshold < 0.60 else "⚖️ Default")
+            st.markdown(
+                f'<div style="font-size:.75rem;color:#ec4f7f;font-weight:600;margin-top:-.2rem;">'
+                f'Threshold aktif: <strong>{threshold:.2f}</strong> &nbsp;{level}</div>',
+                unsafe_allow_html=True
+            )
+        else:
+            threshold = 0.60
+            st.markdown(
+                '<div style="font-size:.75rem;color:#8c8fa3;margin-top:-.1rem;">'
+                'Menggunakan nilai otomatis: <strong style="color:#2b2d3a;">0.60</strong></div>',
+                unsafe_allow_html=True
+            )
 
         analisis_btn = st.button("🔍 Analisis Kemiripan", use_container_width=True)
 
@@ -532,7 +505,7 @@ with col_right:
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 {CSS}
 <style>body{{background:transparent !important;}} .main-card{{border:none !important;}}</style>
-</head><body style="background:transparent;padding:0;margin:0;">
+</head><body style="background:transparent;padding:0;margin:0;overflow-x:hidden;">
 <div id="fm-resize-root">
     {hasil_html}
 </div>
@@ -556,7 +529,8 @@ fmReportHeight();
 window.addEventListener('resize', fmReportHeight);
 </script>
 </body></html>"""
-        components.html(PAGE_HTML, height=1500, scrolling=True)
+        _ph = 800 if (hasil and hasil.get("status") == "ok") else 280
+        components.html(PAGE_HTML, height=_ph, scrolling=True)
 
 # ── Section bawah: Riwayat & Info ─────────────────────────────
 _hasil_json2 = json.dumps({
@@ -569,7 +543,7 @@ _hasil_json2 = json.dumps({
 BOTTOM_HTML = f"""
 <!DOCTYPE html><html lang="id"><head><meta charset="UTF-8">
 {CSS}
-</head><body style="background:transparent;padding:0;margin:0;">
+</head><body style="background:transparent;padding:0;margin:0;overflow-x:hidden;">
 <div class="container-fluid px-0">
 
     <div class="row mb-4">
@@ -644,8 +618,13 @@ BOTTOM_HTML = f"""
                         <span style="color:#c0392b;font-weight:600;">⚠ Keterbatasan:</span> PCA sensitif terhadap perubahan pencahayaan, posisi, dan ekspresi wajah.</div>
                     </div>
                     <div style="background:#f7f7fa;border:1px solid #ececf3;border-radius:10px;padding:0.65rem 0.85rem;">
-                        <div style="font-weight:700;color:#8c8fa3;font-size:0.82rem;margin-bottom:0.25rem;"><i class="fa-solid fa-sliders me-1"></i>Pengaturan Threshold</div>
-                        <div style="color:#444;font-size:0.82rem;">Threshold default: <strong>0.60</strong>. Nilai lebih tinggi = lebih ketat. Nilai lebih rendah = lebih longgar. Atur melalui slider di panel upload.</div>
+                        <div style="font-weight:700;color:#8c8fa3;font-size:0.82rem;margin-bottom:0.25rem;"><i class="fa-solid fa-sliders me-1"></i>Pengaturan Threshold (Opsional)</div>
+                        <div style="color:#444;font-size:0.82rem;">
+                            Threshold default <strong>0.60</strong> sudah dioptimalkan untuk sebagian besar kasus — tidak perlu diubah.<br>
+                            Centang <em>"Atur threshold secara manual"</em> di panel kiri jika ingin menyesuaikan:<br>
+                            <span style="color:#2bb673;">↑ Lebih tinggi</span> = lebih ketat (kurangi false positive) &nbsp;|&nbsp;
+                            <span style="color:#ec4f7f;">↓ Lebih rendah</span> = lebih longgar (tangkap lebih banyak kemiripan)
+                        </div>
                     </div>
                 </div>
             </div>
@@ -713,4 +692,4 @@ document.addEventListener('DOMContentLoaded',function(){{
 </script>
 </body></html>"""
 
-components.html(BOTTOM_HTML, height=620, scrolling=False)
+components.html(BOTTOM_HTML, height=1050, scrolling=True)
