@@ -494,9 +494,14 @@ with col_left:
             <span>⚙️ Threshold Kemiripan PCA</span>
             <span style="background:var(--fm-bg);color:var(--fm-muted);font-size:0.7rem;font-weight:700;padding:0.15rem 0.55rem;border-radius:20px;border:1px solid var(--fm-border);">Opsional</span>
         </div>''', unsafe_allow_html=True)
-        st.caption("Nilai default 0.60 sudah teruji cukup baik. Geser slider hanya jika ingin menyesuaikan tingkat ketelitian kemiripan.")
-        threshold = st.slider("threshold", min_value=0.30, max_value=0.90, value=0.60, step=0.05, label_visibility="collapsed")
-        st.caption(f"Default: 0.60 | Saat ini: {threshold:.2f} | Makin tinggi = makin ketat")
+        st.caption("Default 0.60 sudah dioptimalkan. Centang di bawah hanya jika ingin menyesuaikan.")
+        atur_manual = st.checkbox("Atur threshold secara manual", value=False)
+        if atur_manual:
+            threshold = st.slider("threshold", min_value=0.30, max_value=0.90, value=0.60, step=0.05, label_visibility="collapsed")
+            st.caption(f"Threshold aktif: {threshold:.2f} | Makin tinggi = makin ketat")
+        else:
+            threshold = 0.60
+            st.caption(f"Menggunakan nilai otomatis: {threshold:.2f}")
 
         analisis_btn = st.button("🔍 Analisis Kemiripan", use_container_width=True)
 
