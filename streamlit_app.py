@@ -546,18 +546,17 @@ requestAnimationFrame(anim);}}
 function togglePembuktian(btn){{const box=document.getElementById('boxPembuktian'),ic=btn.querySelector('.fa-chevron-down');
 if(!box)return;const bk=box.style.display==='none';box.style.display=bk?'block':'none';
 ic.style.transform=bk?'rotate(180deg)':'rotate(0deg)';
-parent.postMessage({{type:'fm-resize'}}, '*');}}
+requestAnimationFrame(()=>requestAnimationFrame(fmReportHeight));}}
 function fmReportHeight(){{
-    const h=document.getElementById('fm-resize-root').scrollHeight + 16;
-    if(window.Streamlit){{ /* no-op, fallback below handles it */ }}
-    document.body.dataset.fmHeight=h;
+    const h=document.getElementById('fm-resize-root').scrollHeight + 24;
+    window.parent.postMessage({{type:'streamlit:setFrameHeight', height:h}}, '*');
 }}
 fmReportHeight();
 window.addEventListener('resize', fmReportHeight);
+setTimeout(fmReportHeight, 300);
 </script>
 </body></html>"""
-        _page_height = 1500 if (hasil and hasil.get("status") == "ok") else 380
-        components.html(PAGE_HTML, height=_page_height, scrolling=False)
+        components.html(PAGE_HTML, height=400, scrolling=False)
 
 # ── Section bawah: Riwayat & Info ─────────────────────────────
 _hasil_json2 = json.dumps({
