@@ -9,7 +9,8 @@ from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 
 # ── Page config ──────────────────────────────────────────────
-st.set_page_config(page_title="FaceMatch", page_icon="🔍", layout="wide")
+st.set_page_config(page_title="FaceMatch", page_icon="🔍", layout="wide",
+    initial_sidebar_state="collapsed")
 
 # ── Hide ALL Streamlit chrome + sidebar ──────────────────────
 st.html("""
@@ -22,10 +23,50 @@ st.html("""
 }
 html, body, [class*="css"]{ font-family:'Inter','Segoe UI',sans-serif; }
 
+/* ── FORCE WHITE / ANTI DARK MODE ── */
+html, body,
+[data-testid="stAppViewContainer"],
+[data-testid="stAppViewBlockContainer"],
+[data-testid="stMain"],
+[data-testid="stMainBlockContainer"],
+.stApp,
+.main,
+section[data-testid="stSidebar"] ~ div,
+[data-testid="block-container"] {
+    background-color: #ffffff !important;
+    color: #2b2d3a !important;
+}
+[data-testid="stVerticalBlockBorderWrapper"],
+[data-testid="stVerticalBlock"],
+div[class*="stMarkdown"],
+div[class*="stText"],
+p, span, label, div {
+    color: #2b2d3a !important;
+}
+/* Override Streamlit dark theme variables */
+:root, [data-theme="dark"], [data-theme="light"] {
+    --background-color: #ffffff !important;
+    --secondary-background-color: #f7f7fa !important;
+    --text-color: #2b2d3a !important;
+}
+
 #MainMenu,footer,header{visibility:hidden}
 [data-testid="stSidebar"]{display:none}
 [data-testid="collapsedControl"]{display:none}
-.block-container{padding:1.5rem 2rem 3rem !important;max-width:1400px !important}
+.block-container{padding:1rem 1rem 3rem !important;max-width:1400px !important}
+
+/* Mobile responsive columns */
+@media (max-width: 768px) {
+    .block-container{padding:0.5rem 0.5rem 2rem !important;}
+    [data-testid="column"] {
+        min-width: 100% !important;
+        width: 100% !important;
+    }
+    [data-testid="stHorizontalBlock"] {
+        flex-direction: column !important;
+        gap: 0.75rem !important;
+    }
+}
 
 div[data-testid="column"]:nth-of-type(1) > div[data-testid="stVerticalBlockBorderWrapper"],
 div[data-testid="column"]:nth-of-type(1) div[data-testid="stVerticalBlock"]{
@@ -231,7 +272,23 @@ CSS = """
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
 :root{--fm-pink:#ec4f7f;--fm-pink-light:#fde7ee;--fm-bg:#f7f7fa;--fm-dark:#2b2d3a;--fm-muted:#8c8fa3;--fm-border:#ececf3;--fm-green:#2bb673;--fm-green-bg:#e8f8f0;--fm-amber:#e0a13a;--fm-amber-bg:#fdf2e2;}
-body{background-color:var(--fm-bg);font-family:'Inter','Segoe UI',sans-serif;color:var(--fm-dark);margin:0;overflow-x:hidden;}
+body{background-color:#ffffff;font-family:'Inter','Segoe UI',sans-serif;color:var(--fm-dark);margin:0;overflow-x:hidden;}
+/* Mobile responsive inside iframe */
+@media (max-width: 600px) {
+    .row.g-3.align-items-center { gap: 0.5rem !important; }
+    .col-4 { width: 33.33% !important; }
+    .gauge-wrap { width: 120px !important; height: 120px !important; }
+    .gauge-center .pct { font-size: 1rem !important; }
+    .meta-info-row { flex-direction: column !important; }
+    .meta-info-pill { min-width: unset !important; }
+    .preview-img { max-height: 140px !important; }
+    .result-badge { font-size: 0.78rem !important; padding: 0.5rem 0.75rem !important; }
+    .chart-stats { gap: 0.5rem !important; }
+    .chart-stat { min-width: 100px !important; }
+    .col-lg-5, .col-lg-7 { width: 100% !important; }
+    .table { font-size: 0.78rem !important; }
+    th, td { padding: 0.4rem 0.3rem !important; }
+}
 h1,h2,h3,h4,h5,h6{font-family:'Poppins',sans-serif;}
 .header-section{text-align:center;margin-bottom:2rem;}
 .header-logo{display:inline-flex;align-items:center;justify-content:center;gap:0.85rem;}
@@ -478,7 +535,7 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # ── Layout: kiri (upload) | kanan (hasil) ─────────────────────
-col_left, col_right = st.columns([5, 7], gap="medium")
+col_left, col_right = st.columns([1, 1], gap="medium")
 
 with col_left:
     with st.container(border=True):
