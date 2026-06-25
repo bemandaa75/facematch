@@ -715,4 +715,4 @@ document.addEventListener('DOMContentLoaded',function(){{
 </script>
 </body></html>"""
 
-components.html(BOTTOM_HTML, height=620, scrolling=False)
+components.html(BOTTOM_HTML, height=900, scrolling=True)
